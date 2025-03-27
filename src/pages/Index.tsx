@@ -69,12 +69,12 @@ const Home = () => {
     <MainLayout>
       {/* Hero section - reduced top padding further and made closer to header */}
       <section className="bg-gradient-to-b from-black to-background">
-        <div className="relative px-4 md:px-6 py-6 md:py-12 max-w-7xl mx-auto overflow-hidden">
+        <div className="relative px-4 md:px-6 py-4 md:py-8 max-w-7xl mx-auto overflow-hidden">
           <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/20 rounded-full blur-3xl opacity-30" />
           <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-accent/20 rounded-full blur-3xl opacity-20" />
           
-          <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6 text-center">
+          <div className="relative flex justify-center items-center">
+            <div className="space-y-6 text-center max-w-2xl">
               <div className="inline-flex items-center rounded-full border border-white/10 px-3 py-1 text-sm text-muted-foreground bg-secondary">
                 <TrendingUp size={14} className="mr-1 text-primary" />
                 Platform Cerita Modern Indonesia
@@ -104,41 +104,6 @@ const Home = () => {
                     <BookOpen size={16} className="mr-2" /> Terbitkan Cerita
                   </Link>
                 </Button>
-              </div>
-            </div>
-            
-            <div className="relative h-[400px] lg:h-[500px] max-w-md mx-auto lg:max-w-none group">
-              <div className="absolute inset-0 rounded-2xl overflow-hidden bg-gradient-to-b from-primary/30 to-accent/30 blur-2xl opacity-20 group-hover:opacity-30 transition-opacity" />
-              
-              <div 
-                ref={featuredStoryRef} 
-                className="relative grid grid-cols-2 gap-4 opacity-0"
-              >
-                <div className="flex flex-col gap-4 pt-16">
-                  <img 
-                    src={stories[0].cover} 
-                    alt="Featured story" 
-                    className="w-full object-cover aspect-[3/4] rounded-xl shadow-lg hover:shadow-xl transition-shadow"
-                  />
-                  <img 
-                    src="https://images.unsplash.com/photo-1543002588-bfa74002ed7e?q=80&w=1374" 
-                    alt="Featured story" 
-                    className="w-full object-cover aspect-[3/4] rounded-xl shadow-lg hover:shadow-xl transition-shadow"
-                  />
-                </div>
-                
-                <div className="flex flex-col gap-4">
-                  <img 
-                    src="https://images.unsplash.com/photo-1531425300797-d5dc8b021c84?q=80&w=1470" 
-                    alt="Featured story" 
-                    className="w-full object-cover aspect-[3/4] rounded-xl shadow-lg hover:shadow-xl transition-shadow"
-                  />
-                  <img 
-                    src={stories[1].cover} 
-                    alt="Featured story" 
-                    className="w-full object-cover aspect-[3/4] rounded-xl shadow-lg hover:shadow-xl transition-shadow"
-                  />
-                </div>
               </div>
             </div>
           </div>
