@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -441,7 +442,65 @@ const Publish = () => {
             </TabsContent>
             
             <TabsContent value="chapters" className="mt-0">
-              <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-6">
+                <div className="bg-secondary/40 backdrop-blur-sm rounded-lg border border-border p-4">
+                  <h3 className="font-medium mb-3 flex items-center justify-between">
+                    <span>Chapter List ({formData.chapters.length})</span>
+                    <Badge variant="outline" className="bg-black/20">
+                      {formData.chapters.filter(c => c.isPremium).length} Premium
+                    </Badge>
+                  </h3>
+                  
+                  {formData.chapters.length > 0 ? (
+                    <div className="space-y-2 max-h-[450px] overflow-y-auto pr-2 scrollbar-hidden">
+                      {formData.chapters.map((chapter, index) => (
+                        <Card key={index} className="bg-card/50">
+                          <CardContent className="p-3">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm text-muted-foreground">Chapter {index + 1}</span>
+                                  {chapter.isPremium && (
+                                    <Badge variant="outline" className="bg-black/20 text-yellow-400 text-xs">
+                                      <Coins size={10} className="mr-1" /> Premium
+                                    </Badge>
+                                  )}
+                                </div>
+                                <p className="font-medium">{chapter.title}</p>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  {chapter.content.split(' ').length} kata
+                                </p>
+                              </div>
+                              
+                              <Button 
+                                variant="ghost" 
+                                size="icon"
+                                className="h-8 w-8 text-destructive hover:text-destructive/90 hover:bg-destructive/10"
+                                onClick={() => {
+                                  setFormData({
+                                    ...formData,
+                                    chapters: formData.chapters.filter((_, i) => i !== index)
+                                  });
+                                }}
+                              >
+                                <X size={16} />
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-8 text-center border border-dashed border-border rounded-md bg-secondary/30">
+                      <FileText size={32} className="text-muted-foreground mb-2" />
+                      <p className="text-muted-foreground">Belum ada chapter</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Tambahkan minimal satu chapter
+                      </p>
+                    </div>
+                  )}
+                </div>
+                
                 <div className="space-y-4">
                   <div>
                     <Label htmlFor="chapterTitle" className={formErrors.chapterTitle ? 'text-destructive' : ''}>
@@ -470,8 +529,9 @@ const Publish = () => {
                       onChange={(e) => setChapterContent(e.target.value)}
                       className={`min-h-[400px] ${formErrors.chapterContent ? 'border-destructive' : ''}`}
                     />
-                    <p className={`text-sm mt-1 ${formErrors.chapterContent ? 'text-destructive' : 'text-muted-foreground'}`}>
+                    <p className={`text-sm mt-1 ${formErrors.chapterContent ? 'text-destructive' : chapterContent.split(' ').length >= 100 ? 'text-green-500' : 'text-muted-foreground'}`}>
                       {chapterContent.split(' ').length} kata (minimal 100 kata)
+                      {chapterContent.split(' ').length >= 100 && ' ✓'}
                     </p>
                   </div>
                   
@@ -486,7 +546,7 @@ const Publish = () => {
                     </Label>
                   </div>
                   
-                  <div className="flex items-center justify-between pt-4 border-t border-border">
+                  <div className="flex items-center justify-between pt-4 border-t border-border mt-6">
                     <Button
                       variant="outline"
                       onClick={() => {
@@ -524,66 +584,6 @@ const Publish = () => {
                         Lanjut ke Terbitkan
                       </Button>
                     </div>
-                  </div>
-                </div>
-                
-                <div className="lg:order-first lg:col-span-1">
-                  <div className="bg-secondary/40 backdrop-blur-sm rounded-lg border border-border p-4">
-                    <h3 className="font-medium mb-3 flex items-center justify-between">
-                      <span>Chapter List ({formData.chapters.length})</span>
-                      <Badge variant="outline" className="bg-black/20">
-                        {formData.chapters.filter(c => c.isPremium).length} Premium
-                      </Badge>
-                    </h3>
-                    
-                    {formData.chapters.length > 0 ? (
-                      <div className="space-y-2 max-h-[450px] overflow-y-auto pr-2 scrollbar-hidden">
-                        {formData.chapters.map((chapter, index) => (
-                          <Card key={index} className="bg-card/50">
-                            <CardContent className="p-3">
-                              <div className="flex items-center justify-between">
-                                <div>
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-sm text-muted-foreground">Chapter {index + 1}</span>
-                                    {chapter.isPremium && (
-                                      <Badge variant="outline" className="bg-black/20 text-yellow-400 text-xs">
-                                        <Coins size={10} className="mr-1" /> Premium
-                                      </Badge>
-                                    )}
-                                  </div>
-                                  <p className="font-medium">{chapter.title}</p>
-                                  <p className="text-xs text-muted-foreground mt-1">
-                                    {chapter.content.split(' ').length} kata
-                                  </p>
-                                </div>
-                                
-                                <Button 
-                                  variant="ghost" 
-                                  size="icon"
-                                  className="h-8 w-8 text-destructive hover:text-destructive/90 hover:bg-destructive/10"
-                                  onClick={() => {
-                                    setFormData({
-                                      ...formData,
-                                      chapters: formData.chapters.filter((_, i) => i !== index)
-                                    });
-                                  }}
-                                >
-                                  <X size={16} />
-                                </Button>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="flex flex-col items-center justify-center py-8 text-center border border-dashed border-border rounded-md bg-secondary/30">
-                        <FileText size={32} className="text-muted-foreground mb-2" />
-                        <p className="text-muted-foreground">Belum ada chapter</p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Tambahkan minimal satu chapter
-                        </p>
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>
