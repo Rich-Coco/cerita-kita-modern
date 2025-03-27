@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -110,8 +109,8 @@ const Home = () => {
         </div>
       </section>
       
-      {/* Added py-20 padding below the top section */}
-      <div className="py-20"></div>
+      {/* Added py-10 padding below the top section (reduced from py-20) */}
+      <div className="py-10"></div>
       
       {/* Featured story highlight - reduced top padding to make it closer to hero section */}
       <section className="px-4 md:px-6 py-4 max-w-7xl mx-auto">
