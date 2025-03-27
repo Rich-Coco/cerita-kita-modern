@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { Search, BookOpen, Home, User, Coin, Menu, X } from 'lucide-react';
+import { Search, BookOpen, Home, User, Coins, Menu, X } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 
@@ -91,7 +91,7 @@ const Navbar = () => {
           {isAuthenticated ? (
             <>
               <Link to="/coins" className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-secondary text-yellow-400">
-                <Coin size={16} />
+                <Coins size={16} />
                 <span className="font-medium">120</span>
               </Link>
               

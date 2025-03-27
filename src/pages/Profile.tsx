@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -10,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/components/ui/use-toast';
-import { User, Bookmark, BookOpen, Settings, Pencil, Save, Coin, Heart, Eye } from 'lucide-react';
+import { User, Bookmark, BookOpen, Settings, Pencil, Save, Coins, Heart, Eye } from 'lucide-react';
 import StoryCard from '@/components/story/StoryCard';
 import { stories } from '@/data/stories';
 import MainLayout from '@/components/layout/MainLayout';
@@ -19,7 +18,6 @@ const Profile = () => {
   const [profileTab, setProfileTab] = useState('stories');
   const [isEditing, setIsEditing] = useState(false);
   
-  // Fake user data (in a real app, this would come from auth context)
   const [userData, setUserData] = useState({
     name: 'Budi Pratama',
     username: 'budipratama',
@@ -43,7 +41,6 @@ const Profile = () => {
     <MainLayout>
       <div className="py-8 md:py-12 max-w-7xl mx-auto px-4 md:px-6">
         <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-8">
-          {/* Profile Sidebar */}
           <div className="space-y-6">
             <Card className="overflow-hidden">
               <div className="h-24 bg-gradient-to-r from-primary to-accent" />
@@ -65,7 +62,7 @@ const Profile = () => {
                       </Badge>
                       
                       <Badge variant="outline" className="bg-black/20 text-yellow-400">
-                        <Coin size={12} className="mr-1" /> {userData.coins}
+                        <Coins size={12} className="mr-1" /> {userData.coins}
                       </Badge>
                     </div>
                   </div>
@@ -86,7 +83,7 @@ const Profile = () => {
                   <div className="mt-4 w-full grid grid-cols-2 gap-2">
                     <Button asChild variant="outline" className="w-full">
                       <Link to="/coins">
-                        <Coin size={16} className="mr-2 text-yellow-400" />
+                        <Coins size={16} className="mr-2 text-yellow-400" />
                         Beli Koin
                       </Link>
                     </Button>
@@ -127,7 +124,6 @@ const Profile = () => {
             </div>
           </div>
           
-          {/* Main Content */}
           <div>
             <Tabs value={profileTab} onValueChange={setProfileTab}>
               <TabsList className="mb-6">
@@ -327,7 +323,7 @@ const Profile = () => {
                           <div>
                             <h3 className="text-sm font-medium text-muted-foreground">Koin</h3>
                             <div className="flex items-center gap-1">
-                              <Coin size={16} className="text-yellow-400" />
+                              <Coins size={16} className="text-yellow-400" />
                               <p>{userData.coins} Koin</p>
                             </div>
                           </div>

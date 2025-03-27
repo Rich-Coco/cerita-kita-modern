@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -11,7 +10,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { toast } from '@/components/ui/use-toast';
-import { Plus, X, Upload, Check, FileText, ChevronRight, Coin } from 'lucide-react';
+import { Plus, X, Upload, Check, FileText, ChevronRight, Coins } from 'lucide-react';
 import { StoryFormData } from '@/types/story';
 import MainLayout from '@/components/layout/MainLayout';
 
@@ -44,7 +43,6 @@ const availableTags = [
   'Inspiratif',
 ];
 
-// Initial empty form data
 const initialFormData: StoryFormData = {
   title: '',
   synopsis: '',
@@ -61,12 +59,10 @@ const Publish = () => {
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const [tagInput, setTagInput] = useState('');
   
-  // Chapter form state
   const [chapterTitle, setChapterTitle] = useState('');
   const [chapterContent, setChapterContent] = useState('');
   const [isPremium, setIsPremium] = useState(false);
   
-  // Form validation states
   const [formErrors, setFormErrors] = useState({
     title: false,
     synopsis: false,
@@ -77,7 +73,6 @@ const Publish = () => {
     chapterContent: false,
   });
   
-  // Check if the info tab is complete
   const isInfoComplete = 
     formData.title !== '' && 
     formData.synopsis.split(' ').length >= 25 && 
@@ -85,13 +80,11 @@ const Publish = () => {
     formData.tags.length > 0 && 
     formData.cover !== null;
   
-  // Handle cover image upload
   const handleCoverUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setFormData({ ...formData, cover: file });
       
-      // Create a preview URL
       const reader = new FileReader();
       reader.onloadend = () => {
         setCoverPreview(reader.result as string);
@@ -100,7 +93,6 @@ const Publish = () => {
     }
   };
   
-  // Handle adding a tag
   const handleAddTag = (tag: string) => {
     if (!formData.tags.includes(tag)) {
       setFormData({ ...formData, tags: [...formData.tags, tag] });
@@ -108,12 +100,10 @@ const Publish = () => {
     setTagInput('');
   };
   
-  // Handle removing a tag
   const handleRemoveTag = (tag: string) => {
     setFormData({ ...formData, tags: formData.tags.filter(t => t !== tag) });
   };
   
-  // Validate the first tab (story info)
   const validateInfoTab = () => {
     const synopsisWords = formData.synopsis.split(' ').length;
     const errors = {
@@ -136,7 +126,6 @@ const Publish = () => {
     return false;
   };
   
-  // Handle continuing to chapters tab
   const handleContinueToChapters = () => {
     if (validateInfoTab()) {
       setCurrentTab('chapters');
@@ -149,7 +138,6 @@ const Publish = () => {
     }
   };
   
-  // Validate chapter form
   const validateChapter = () => {
     const contentWords = chapterContent.split(' ').length;
     const errors = {
@@ -167,7 +155,6 @@ const Publish = () => {
     return false;
   };
   
-  // Handle adding a chapter
   const handleAddChapter = () => {
     if (validateChapter()) {
       const newChapter = {
@@ -181,7 +168,6 @@ const Publish = () => {
         chapters: [...formData.chapters, newChapter],
       });
       
-      // Reset chapter form
       setChapterTitle('');
       setChapterContent('');
       setIsPremium(false);
@@ -199,7 +185,6 @@ const Publish = () => {
     }
   };
   
-  // Handle submit and publish
   const handlePublish = () => {
     if (formData.chapters.length === 0) {
       toast({
@@ -210,7 +195,6 @@ const Publish = () => {
       return;
     }
     
-    // In a real app, this would send data to the backend
     console.log('Publishing story:', formData);
     
     toast({
@@ -218,7 +202,6 @@ const Publish = () => {
       description: "Cerita anda telah berhasil diterbitkan dan kini tersedia untuk dibaca.",
     });
     
-    // Navigate to search page after publishing
     setTimeout(() => {
       navigate('/search');
     }, 1500);
@@ -250,7 +233,6 @@ const Publish = () => {
           </div>
           
           <div className="bg-card border border-border rounded-lg p-6">
-            {/* Story Information Tab */}
             <TabsContent value="info" className="space-y-6 mt-0">
               <div className="space-y-4">
                 <div>
@@ -430,10 +412,8 @@ const Publish = () => {
               </div>
             </TabsContent>
             
-            {/* Chapters Tab */}
             <TabsContent value="chapters" className="mt-0">
               <div className="grid grid-cols-1 lg:grid-cols-[1fr_260px] gap-6">
-                {/* Chapter editor */}
                 <div className="space-y-4">
                   <div>
                     <Label htmlFor="chapterTitle" className={formErrors.chapterTitle ? 'text-destructive' : ''}>
@@ -474,7 +454,7 @@ const Publish = () => {
                       onCheckedChange={setIsPremium}
                     />
                     <Label htmlFor="premium" className="flex items-center gap-1 cursor-pointer">
-                      Chapter Premium <Coin size={14} className="text-yellow-400" />
+                      Chapter Premium <Coins size={14} className="text-yellow-400" />
                     </Label>
                   </div>
                   
@@ -519,7 +499,6 @@ const Publish = () => {
                   </div>
                 </div>
                 
-                {/* Chapter list */}
                 <div className="lg:order-first lg:col-span-1">
                   <div className="bg-secondary/40 backdrop-blur-sm rounded-lg border border-border p-4">
                     <h3 className="font-medium mb-3 flex items-center justify-between">
@@ -540,7 +519,7 @@ const Publish = () => {
                                     <span className="text-sm text-muted-foreground">Chapter {index + 1}</span>
                                     {chapter.isPremium && (
                                       <Badge variant="outline" className="bg-black/20 text-yellow-400 text-xs">
-                                        <Coin size={10} className="mr-1" /> Premium
+                                        <Coins size={10} className="mr-1" /> Premium
                                       </Badge>
                                     )}
                                   </div>
@@ -582,7 +561,6 @@ const Publish = () => {
               </div>
             </TabsContent>
             
-            {/* Publish Tab */}
             <TabsContent value="publish" className="mt-0">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
                 <div className="space-y-6">
@@ -622,7 +600,7 @@ const Publish = () => {
                         </Badge>
                         
                         <Badge variant="outline" className="bg-black/20 text-yellow-400">
-                          <Coin size={12} className="mr-1" /> 
+                          <Coins size={12} className="mr-1" /> 
                           {formData.chapters.filter(c => c.isPremium).length} Premium
                         </Badge>
                       </div>
@@ -647,7 +625,7 @@ const Publish = () => {
                             
                             {chapter.isPremium && (
                               <Badge variant="outline" className="bg-black/20 text-yellow-400 text-xs">
-                                <Coin size={10} className="mr-1" /> Premium
+                                <Coins size={10} className="mr-1" /> Premium
                               </Badge>
                             )}
                           </div>

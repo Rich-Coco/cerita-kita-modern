@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Coin, CreditCard, Check, Gem, Sparkles } from 'lucide-react';
+import { Coins, CreditCard, Check, Gem, Sparkles } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import MainLayout from '@/components/layout/MainLayout';
 
@@ -106,7 +105,7 @@ const Coins = () => {
                 <div className="text-center">
                   <div className="inline-flex items-center justify-center p-4 bg-primary/10 rounded-full mb-2">
                     {pkg.id === 'basic' ? (
-                      <Coin size={28} className="text-yellow-400" />
+                      <Coins size={28} className="text-yellow-400" />
                     ) : pkg.id === 'premium' ? (
                       <Gem size={28} className="text-primary" />
                     ) : (
@@ -115,7 +114,7 @@ const Coins = () => {
                   </div>
                   
                   <div className="flex items-center justify-center gap-1 text-3xl font-bold">
-                    <Coin size={20} className="text-yellow-400" />
+                    <Coins size={20} className="text-yellow-400" />
                     <span>{pkg.coins}</span>
                   </div>
                   
@@ -155,7 +154,7 @@ const Coins = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="space-y-2">
               <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center">
-                <Coin size={20} className="text-primary" />
+                <Coins size={20} className="text-primary" />
               </div>
               <h4 className="font-medium">Beli Koin</h4>
               <p className="text-sm text-muted-foreground">
