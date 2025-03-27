@@ -67,14 +67,14 @@ const Home = () => {
   
   return (
     <MainLayout>
-      {/* Hero section - reduced top padding */}
+      {/* Hero section - reduced top padding further and made closer to header */}
       <section className="bg-gradient-to-b from-black to-background">
-        <div className="relative px-4 md:px-6 py-12 md:py-20 max-w-7xl mx-auto overflow-hidden">
+        <div className="relative px-4 md:px-6 py-6 md:py-12 max-w-7xl mx-auto overflow-hidden">
           <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/20 rounded-full blur-3xl opacity-30" />
           <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-accent/20 rounded-full blur-3xl opacity-20" />
           
           <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-6 text-center lg:text-left">
+            <div className="space-y-6 text-center">
               <div className="inline-flex items-center rounded-full border border-white/10 px-3 py-1 text-sm text-muted-foreground bg-secondary">
                 <TrendingUp size={14} className="mr-1 text-primary" />
                 Platform Cerita Modern Indonesia
@@ -88,11 +88,11 @@ const Home = () => {
                 </span>
               </h1>
               
-              <p className="text-lg text-muted-foreground max-w-xl mx-auto lg:mx-0">
+              <p className="text-lg text-muted-foreground max-w-xl mx-auto">
                 Baca dan terbitkan cerita dalam berbagai genre. Jelajahi imajinasi tanpa batas dari penulis Indonesia langsung dari perangkatmu.
               </p>
               
-              <div className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start">
+              <div className="flex flex-col sm:flex-row items-center gap-4 justify-center">
                 <Button asChild size="lg" className="w-full sm:w-auto">
                   <Link to="/search">
                     Mulai Membaca <ArrowRight size={16} className="ml-2" />
