@@ -67,9 +67,9 @@ const Home = () => {
   
   return (
     <MainLayout>
-      {/* Hero section */}
+      {/* Hero section - reduced top padding */}
       <section className="bg-gradient-to-b from-black to-background">
-        <div className="relative px-4 md:px-6 py-20 md:py-32 max-w-7xl mx-auto overflow-hidden">
+        <div className="relative px-4 md:px-6 py-12 md:py-20 max-w-7xl mx-auto overflow-hidden">
           <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/20 rounded-full blur-3xl opacity-30" />
           <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-accent/20 rounded-full blur-3xl opacity-20" />
           
@@ -145,32 +145,10 @@ const Home = () => {
         </div>
       </section>
       
-      {/* Trending stories section */}
-      <section className="px-4 md:px-6 py-16 md:py-24 max-w-7xl mx-auto">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Trending Saat Ini</h2>
-            <p className="text-muted-foreground mt-1">Cerita populer yang sedang banyak dibaca</p>
-          </div>
-          
-          <Button variant="link" asChild>
-            <Link to="/search?filter=trending" className="flex items-center gap-1">
-              Lihat Semua <ArrowRight size={16} />
-            </Link>
-          </Button>
-        </div>
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {stories.map((story) => (
-            <StoryCard key={story.id} story={story} />
-          ))}
-          <StoryCard story={stories[0]} />
-          <StoryCard story={stories[1]} />
-        </div>
-      </section>
+      {/* "Trending saat ini" section has been removed */}
       
-      {/* Featured story highlight */}
-      <section className="px-4 md:px-6 py-8 max-w-7xl mx-auto">
+      {/* Featured story highlight - reduced top padding to make it closer to hero section */}
+      <section className="px-4 md:px-6 py-4 max-w-7xl mx-auto">
         <div className="mb-6">
           <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Sorotan Istimewa</h2>
           <p className="text-muted-foreground mt-1">Pilihan editor untuk dibaca minggu ini</p>
@@ -194,8 +172,8 @@ const Home = () => {
         </div>
       </section>
       
-      {/* Genres section */}
-      <section className="px-4 md:px-6 py-16 md:py-24 max-w-7xl mx-auto">
+      {/* Genres section - reduced top padding */}
+      <section className="px-4 md:px-6 py-8 md:py-12 max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div>
             <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Jelajahi Genre</h2>
@@ -221,8 +199,8 @@ const Home = () => {
         </div>
       </section>
       
-      {/* Join community section */}
-      <section className="px-4 md:px-6 py-16 md:py-20 max-w-7xl mx-auto">
+      {/* Join community section - reduced top padding */}
+      <section className="px-4 md:px-6 py-8 md:py-12 max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <GradientSection 
             title="Bergabunglah dengan Komunitas Penulis Kami"
