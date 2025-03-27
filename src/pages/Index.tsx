@@ -110,7 +110,8 @@ const Home = () => {
         </div>
       </section>
       
-      {/* "Trending saat ini" section has been removed */}
+      {/* Added py-20 padding below the top section */}
+      <div className="py-20"></div>
       
       {/* Featured story highlight - reduced top padding to make it closer to hero section */}
       <section className="px-4 md:px-6 py-4 max-w-7xl mx-auto">
