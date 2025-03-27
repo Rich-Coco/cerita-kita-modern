@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -73,6 +73,8 @@ const Publish = () => {
     chapterContent: false,
   });
   
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
   const isInfoComplete = 
     formData.title !== '' && 
     formData.synopsis.split(' ').length >= 25 && 
@@ -90,6 +92,17 @@ const Publish = () => {
         setCoverPreview(reader.result as string);
       };
       reader.readAsDataURL(file);
+      
+      setFormErrors({
+        ...formErrors,
+        cover: false
+      });
+    }
+  };
+  
+  const handleCoverButtonClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
     }
   };
   
@@ -259,11 +272,21 @@ const Publish = () => {
                     id="synopsis"
                     placeholder="Tuliskan sinopsis cerita (minimal 25 kata)"
                     value={formData.synopsis}
-                    onChange={(e) => setFormData({ ...formData, synopsis: e.target.value })}
+                    onChange={(e) => {
+                      const newSynopsis = e.target.value;
+                      setFormData({ ...formData, synopsis: newSynopsis });
+                      if (newSynopsis.split(' ').length >= 25) {
+                        setFormErrors({
+                          ...formErrors,
+                          synopsis: false
+                        });
+                      }
+                    }}
                     className={`min-h-32 ${formErrors.synopsis ? 'border-destructive' : ''}`}
                   />
-                  <p className={`text-sm mt-1 ${formErrors.synopsis ? 'text-destructive' : 'text-muted-foreground'}`}>
+                  <p className={`text-sm mt-1 ${formErrors.synopsis ? 'text-destructive' : formData.synopsis.split(' ').length >= 25 ? 'text-green-500' : 'text-muted-foreground'}`}>
                     {formData.synopsis.split(' ').length} kata (minimal 25 kata)
+                    {formData.synopsis.split(' ').length >= 25 && ' ✓'}
                   </p>
                 </div>
                 
@@ -355,7 +378,8 @@ const Publish = () => {
                     <div 
                       className={`relative h-40 w-32 border-2 border-dashed rounded-md flex flex-col items-center justify-center overflow-hidden ${
                         formErrors.cover ? 'border-destructive' : 'border-border'
-                      }`}
+                      } cursor-pointer`}
+                      onClick={handleCoverButtonClick}
                     >
                       {coverPreview ? (
                         <img 
@@ -375,6 +399,7 @@ const Publish = () => {
                       <input 
                         type="file" 
                         id="cover" 
+                        ref={fileInputRef}
                         accept="image/*" 
                         className="sr-only"
                         onChange={handleCoverUpload}
@@ -382,12 +407,15 @@ const Publish = () => {
                     </div>
                     
                     <div className="flex-1">
-                      <Label htmlFor="cover" asChild>
-                        <Button variant="outline" className="mb-2 w-full sm:w-auto">
-                          <Upload size={16} className="mr-2" />
-                          {coverPreview ? 'Ganti Cover' : 'Upload Cover'}
-                        </Button>
-                      </Label>
+                      <Button 
+                        variant="outline" 
+                        className="mb-2 w-full sm:w-auto"
+                        onClick={handleCoverButtonClick}
+                        type="button"
+                      >
+                        <Upload size={16} className="mr-2" />
+                        {coverPreview ? 'Ganti Cover' : 'Upload Cover'}
+                      </Button>
                       
                       <p className="text-xs text-muted-foreground">
                         Ukuran yang disarankan: 600 x 800 pixel (3:4 ratio).<br />
