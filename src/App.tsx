@@ -12,6 +12,7 @@ import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import StoryPage from "./pages/StoryPage";
 import Auth from "./pages/Auth";
+import ProfileSetup from "./pages/ProfileSetup";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/publish" element={<Publish />} />
           <Route path="/coins" element={<Coins />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/profile-setup" element={<ProfileSetup />} />
           <Route path="/story/:id" element={<StoryPage />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="*" element={<NotFound />} />

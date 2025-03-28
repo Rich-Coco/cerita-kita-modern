@@ -48,13 +48,13 @@ export const LoginForm = () => {
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      // Success notification and redirect
+      // Success notification and redirect to profile page
       toast({
         title: "Login berhasil",
         description: "Selamat datang kembali!",
       });
       
-      navigate('/');
+      navigate('/profile');
     } catch (error) {
       // Error notification
       toast({

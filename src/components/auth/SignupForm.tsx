@@ -55,13 +55,13 @@ export const SignupForm = () => {
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      // Success notification and redirect
+      // Success notification and redirect to profile setup
       toast({
         title: "Pendaftaran berhasil",
-        description: "Selamat bergabung dengan CeritaKita!",
+        description: "Silakan lengkapi profil Anda",
       });
       
-      navigate('/');
+      navigate('/profile-setup');
     } catch (error) {
       // Error notification
       toast({
