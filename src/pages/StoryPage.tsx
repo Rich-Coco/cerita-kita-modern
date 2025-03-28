@@ -208,6 +208,7 @@ const StoryPage = () => {
     
     return (
       <div className="bg-background min-h-screen">
+        {/* Top navigation section with back button and chapter info */}
         <div className="sticky top-16 z-10 bg-background/80 backdrop-blur-sm border-b border-border">
           <div className="container max-w-4xl mx-auto px-4 py-3">
             <div className="flex justify-between items-center">
@@ -235,17 +236,19 @@ const StoryPage = () => {
           </div>
         </div>
         
-        {/* Enhanced chapter title display - reduced top padding from py-6 to py-3 */}
-        <div className="bg-black py-3 text-center mb-6">
-          <h1 className="text-2xl md:text-3xl font-bold text-white">
-            {currentChapter.title}
-          </h1>
-          <p className="text-gray-300 text-sm mt-2">
-            Bab {currentChapterIndex + 1} dari {story.chapters.length}
-          </p>
+        {/* Enhanced chapter title section - black background with clear title */}
+        <div className="bg-black text-center">
+          <div className="container max-w-4xl mx-auto px-4 py-4">
+            <h1 className="text-2xl md:text-3xl font-bold text-white">
+              {currentChapter.title}
+            </h1>
+            <p className="text-gray-300 text-sm mt-1">
+              Bab {currentChapterIndex + 1} dari {story.chapters.length}
+            </p>
+          </div>
         </div>
         
-        <div className="container max-w-2xl mx-auto px-4 pb-10">
+        <div className="container max-w-2xl mx-auto px-4 pb-10 mt-8">
           {isPremiumLocked ? (
             <div className="flex flex-col items-center justify-center py-12 px-4 space-y-4 bg-secondary/30 rounded-xl border border-border">
               <Lock size={48} className="text-amber-500 mb-2" />
