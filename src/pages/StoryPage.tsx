@@ -236,19 +236,19 @@ const StoryPage = () => {
           </div>
         </div>
         
-        {/* Enhanced chapter title section - moved higher with better spacing */}
-        <div className="bg-black text-center py-8 mt-0">
+        {/* Improved chapter title section - Clear heading with more spacing */}
+        <div className="bg-gradient-to-b from-black to-background text-center py-12 mb-8">
           <div className="container max-w-4xl mx-auto px-4">
-            <h1 className="text-2xl md:text-3xl font-bold text-white">
+            <h1 className="text-3xl md:text-4xl font-bold text-white">
               {currentChapter.title}
             </h1>
-            <p className="text-gray-300 text-sm mt-3">
+            <p className="text-gray-300 text-sm mt-4">
               Bab {currentChapterIndex + 1} dari {story.chapters.length}
             </p>
           </div>
         </div>
         
-        <div className="container max-w-2xl mx-auto px-4 pb-10 mt-8">
+        <div className="container max-w-2xl mx-auto px-4 pb-10">
           {isPremiumLocked ? (
             <div className="flex flex-col items-center justify-center py-12 px-4 space-y-4 bg-secondary/30 rounded-xl border border-border">
               <Lock size={48} className="text-amber-500 mb-2" />
