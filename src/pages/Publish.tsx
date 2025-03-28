@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -12,7 +11,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { toast } from '@/components/ui/use-toast';
 import { Plus, X, Upload, Check, FileText, ChevronRight, Coins } from 'lucide-react';
-import { StoryFormData } from '@/types/story';
+import { StoryFormData, Story } from '@/types/story';
+import { stories } from '@/data/stories';
 import MainLayout from '@/components/layout/MainLayout';
 
 const genres = [
@@ -209,7 +209,28 @@ const Publish = () => {
       return;
     }
     
-    console.log('Publishing story:', formData);
+    const newStory: Story = {
+      id: `${stories.length + 1}`,
+      title: formData.title,
+      cover: coverPreview || 'https://images.unsplash.com/photo-1532012197267-da84d127e765?q=80&w=2070',
+      author: "Penulis Baru",
+      synopsis: formData.synopsis,
+      genre: formData.genre,
+      tags: formData.tags,
+      datePublished: new Date().toISOString().split('T')[0],
+      views: 0,
+      likes: 0,
+      chapters: formData.chapters.map((chapter, index) => ({
+        id: `${stories.length + 1}-${index + 1}`,
+        title: chapter.title,
+        content: chapter.content,
+        isPremium: chapter.isPremium,
+      })),
+    };
+    
+    stories.unshift(newStory);
+    
+    console.log('Publishing story:', newStory);
     
     toast({
       title: "Cerita Berhasil Diterbitkan!",
