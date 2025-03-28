@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -119,21 +120,9 @@ const Home = () => {
           <p className="text-muted-foreground mt-1">Pilihan editor untuk dibaca minggu ini</p>
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <StoryCard story={stories[0]} variant="featured" className="lg:col-span-2" />
-          
-          <div className="space-y-6">
-            <div className="p-6 bg-secondary/50 backdrop-blur-sm rounded-xl border border-border">
-              <h3 className="font-medium flex items-center gap-2 mb-3">
-                <Bookmark size={16} className="text-primary" /> Rekomendasi Teratas
-              </h3>
-              <div className="space-y-3">
-                {stories.map((story) => (
-                  <StoryCard key={story.id} story={story} variant="compact" />
-                ))}
-              </div>
-            </div>
-          </div>
+        <div>
+          {/* Featured story card that takes full width now */}
+          <StoryCard story={stories[0]} variant="featured" />
         </div>
       </section>
       
