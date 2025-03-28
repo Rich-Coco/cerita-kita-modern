@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { stories } from '@/data/stories';
@@ -208,9 +207,8 @@ const StoryPage = () => {
     
     return (
       <div className="bg-background min-h-screen">
-        {/* Top navigation section with back button and chapter info */}
-        <div className="sticky top-16 z-10 bg-background/80 backdrop-blur-sm border-b border-border">
-          <div className="container max-w-4xl mx-auto px-4 py-3">
+        <div className="sticky top-16 z-10 bg-background border-b border-border py-3">
+          <div className="container max-w-4xl mx-auto px-4">
             <div className="flex justify-between items-center">
               <Button 
                 variant="ghost" 
@@ -220,10 +218,6 @@ const StoryPage = () => {
                 <ChevronLeft className="h-4 w-4 mr-1" />
                 Kembali
               </Button>
-              
-              <div className="text-sm font-medium truncate max-w-[200px]">
-                {currentChapter.title}
-              </div>
               
               <Button 
                 variant="ghost" 
@@ -236,13 +230,12 @@ const StoryPage = () => {
           </div>
         </div>
         
-        {/* Improved chapter title section - Clear heading with more spacing */}
-        <div className="bg-gradient-to-b from-black to-background text-center py-12 mb-8">
+        <div className="bg-black text-center py-16 mb-10">
           <div className="container max-w-4xl mx-auto px-4">
-            <h1 className="text-3xl md:text-4xl font-bold text-white">
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
               {currentChapter.title}
             </h1>
-            <p className="text-gray-300 text-sm mt-4">
+            <p className="text-gray-300 text-base">
               Bab {currentChapterIndex + 1} dari {story.chapters.length}
             </p>
           </div>
