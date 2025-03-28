@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
@@ -64,7 +63,6 @@ const Search = () => {
   useEffect(() => {
     let result = [...stories];
     
-    // Filter by search query
     if (searchQuery) {
       result = result.filter(
         story => 
@@ -74,12 +72,10 @@ const Search = () => {
       );
     }
     
-    // Filter by genre
     if (selectedGenre && selectedGenre !== 'Semua Genre') {
       result = result.filter(story => story.genre === selectedGenre);
     }
     
-    // Filter by tags
     if (selectedTags.length > 0) {
       result = result.filter(story => 
         selectedTags.some(tag => story.tags.includes(tag))
@@ -88,7 +84,6 @@ const Search = () => {
     
     setFilteredStories(result);
     
-    // Update URL
     const params = new URLSearchParams();
     if (searchQuery) params.set('q', searchQuery);
     if (selectedGenre !== 'Semua Genre') params.set('genre', selectedGenre);
@@ -99,7 +94,6 @@ const Search = () => {
   
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    // Search is already handled by the useEffect
   };
   
   const toggleTag = (tag: string) => {
@@ -137,7 +131,6 @@ const Search = () => {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-8">
-          {/* Filters sidebar */}
           <div className={`${isFilterOpen ? 'block' : 'hidden'} md:block`}>
             <div className="bg-card rounded-lg border border-border p-5 sticky top-24 space-y-6">
               <form onSubmit={handleSearch} className="space-y-3">
@@ -204,7 +197,6 @@ const Search = () => {
             </div>
           </div>
           
-          {/* Results */}
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <p className="text-muted-foreground">
@@ -225,13 +217,6 @@ const Search = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredStories.map((story) => (
                   <StoryCard key={story.id} story={story} />
-                ))}
-                {/* Add some duplicate stories for demo */}
-                {filteredStories.map((story) => (
-                  <StoryCard key={`${story.id}-dup`} story={story} />
-                ))}
-                {filteredStories.map((story) => (
-                  <StoryCard key={`${story.id}-dup2`} story={story} />
                 ))}
               </div>
             ) : (
