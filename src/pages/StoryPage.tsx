@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { stories } from '@/data/stories';
@@ -27,16 +26,17 @@ import {
   PaginationItem, 
   PaginationLink, 
   PaginationNext, 
-  PaginationPrevious 
+  PaginationPrevious,
+  PaginationEllipsis
 } from '@/components/ui/pagination';
 import { toast } from '@/hooks/use-toast';
+import { Coins } from '@/components/ui/coins';
 
 const StoryPage = () => {
   const { id } = useParams<{ id: string }>();
   const [currentChapterIndex, setCurrentChapterIndex] = useState(0);
   const [isReading, setIsReading] = useState(false);
 
-  // Find the story with the matching ID
   const story = stories.find(s => s.id === id);
 
   if (!story) {
@@ -60,7 +60,6 @@ const StoryPage = () => {
 
   const currentChapter = story.chapters[currentChapterIndex];
 
-  // Navigate to next/previous chapter
   const navigateChapter = (direction: 'next' | 'prev') => {
     if (direction === 'next' && currentChapterIndex < story.chapters.length - 1) {
       setCurrentChapterIndex(prev => prev + 1);
@@ -71,7 +70,6 @@ const StoryPage = () => {
     }
   };
 
-  // Handler for premium content
   const handlePremiumContent = () => {
     toast({
       title: "Konten Premium",
@@ -80,7 +78,6 @@ const StoryPage = () => {
     });
   };
 
-  // Handler for bookmark
   const handleBookmark = () => {
     toast({
       title: "Cerita Disimpan",
@@ -89,7 +86,6 @@ const StoryPage = () => {
     });
   };
 
-  // Story Info View
   const StoryInfoView = () => (
     <div className="container max-w-4xl mx-auto py-8 px-4">
       <Button variant="ghost" asChild className="mb-6">
@@ -100,7 +96,6 @@ const StoryPage = () => {
       </Button>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Cover image */}
         <div className="md:col-span-1">
           <div className="relative aspect-[2/3] overflow-hidden rounded-lg border border-border">
             <img 
@@ -124,7 +119,6 @@ const StoryPage = () => {
           </div>
         </div>
 
-        {/* Story details */}
         <div className="md:col-span-2 space-y-4">
           <h1 className="text-3xl font-bold">{story.title}</h1>
           
@@ -208,14 +202,11 @@ const StoryPage = () => {
     </div>
   );
 
-  // Reading View
   const ReadingView = () => {
-    // Check if current chapter is premium
     const isPremiumLocked = currentChapter.isPremium;
     
     return (
       <div className="bg-background min-h-screen">
-        {/* Reading header */}
         <div className="sticky top-16 z-10 bg-background/80 backdrop-blur-sm border-b border-border">
           <div className="container max-w-4xl mx-auto px-4 py-3">
             <div className="flex justify-between items-center">
@@ -268,7 +259,6 @@ const StoryPage = () => {
             </div>
           ) : (
             <div>
-              {/* Render chapter content paragraph by paragraph */}
               {currentChapter.content.split('\n\n').map((paragraph, index) => (
                 <p key={index} className="mb-4 leading-relaxed text-lg">
                   {paragraph}

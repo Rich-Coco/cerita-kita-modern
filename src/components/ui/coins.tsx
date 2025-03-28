@@ -3,14 +3,14 @@ import React from "react";
 import { Coins as CoinsIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-interface CoinsProps extends React.HTMLAttributes<HTMLDivElement> {
+interface CoinsProps {
   size?: "sm" | "default" | "lg";
+  className?: string;
 }
 
 const Coins = ({ 
   className,
   size = "default",
-  ...props
 }: CoinsProps) => {
   return (
     <CoinsIcon
@@ -21,7 +21,6 @@ const Coins = ({
         size === "lg" && "h-6 w-6",
         className
       )}
-      {...props}
     />
   );
 };
