@@ -10,6 +10,7 @@ import Publish from "./pages/Publish";
 import Coins from "./pages/Coins";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import StoryPage from "./pages/StoryPage";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/publish" element={<Publish />} />
           <Route path="/coins" element={<Coins />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/story/:id" element={<StoryPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
