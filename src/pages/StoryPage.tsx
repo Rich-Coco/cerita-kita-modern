@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { stories } from '@/data/stories';
@@ -234,14 +235,17 @@ const StoryPage = () => {
           </div>
         </div>
         
-        <div className="container max-w-2xl mx-auto px-4 py-10">
-          <h1 className="text-2xl md:text-3xl font-bold text-center mb-2">
+        {/* Enhanced chapter title display */}
+        <div className="bg-black py-6 text-center mb-6">
+          <h1 className="text-2xl md:text-3xl font-bold text-white">
             {currentChapter.title}
           </h1>
-          <p className="text-muted-foreground text-center text-sm mb-8">
+          <p className="text-gray-300 text-sm mt-2">
             Bab {currentChapterIndex + 1} dari {story.chapters.length}
           </p>
-          
+        </div>
+        
+        <div className="container max-w-2xl mx-auto px-4 pb-10">
           {isPremiumLocked ? (
             <div className="flex flex-col items-center justify-center py-12 px-4 space-y-4 bg-secondary/30 rounded-xl border border-border">
               <Lock size={48} className="text-amber-500 mb-2" />
