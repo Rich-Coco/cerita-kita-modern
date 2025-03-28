@@ -236,13 +236,13 @@ const StoryPage = () => {
           </div>
         </div>
         
-        {/* Enhanced chapter title section - black background with clear title */}
-        <div className="bg-black text-center py-6">
+        {/* Enhanced chapter title section - moved higher with better spacing */}
+        <div className="bg-black text-center py-8 mt-0">
           <div className="container max-w-4xl mx-auto px-4">
             <h1 className="text-2xl md:text-3xl font-bold text-white">
               {currentChapter.title}
             </h1>
-            <p className="text-gray-300 text-sm mt-2">
+            <p className="text-gray-300 text-sm mt-3">
               Bab {currentChapterIndex + 1} dari {story.chapters.length}
             </p>
           </div>
