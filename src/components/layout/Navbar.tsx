@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Search, BookOpen, Home, User, Coins, Menu, X } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -32,6 +32,7 @@ const NavItem = ({ to, icon, label, isActive }: NavItemProps) => {
 
 const Navbar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
@@ -40,6 +41,11 @@ const Navbar = () => {
   
   // Toggle auth for demo purposes
   const toggleAuth = () => setIsAuthenticated(!isAuthenticated);
+  
+  // Handle login/signup navigation
+  const handleAuthNavigation = (type: 'login' | 'signup') => {
+    navigate('/auth');
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -105,14 +111,14 @@ const Navbar = () => {
           ) : (
             <div className="hidden md:flex items-center gap-2">
               <Button 
-                onClick={toggleAuth} 
+                onClick={() => handleAuthNavigation('login')} 
                 variant="ghost" 
                 className="hover:bg-secondary"
               >
                 Masuk
               </Button>
               <Button 
-                onClick={toggleAuth} 
+                onClick={() => handleAuthNavigation('signup')} 
                 className="relative overflow-hidden group"
               >
                 <span className="relative z-10">Daftar</span>
@@ -149,12 +155,14 @@ const Navbar = () => {
             {!isAuthenticated && (
               <div className="flex flex-col gap-2 pt-4 border-t border-border mt-2">
                 <Button 
-                  onClick={toggleAuth} 
+                  onClick={() => handleAuthNavigation('login')} 
                   variant="outline"
                 >
                   Masuk
                 </Button>
-                <Button onClick={toggleAuth}>
+                <Button 
+                  onClick={() => handleAuthNavigation('signup')}
+                >
                   Daftar
                 </Button>
               </div>

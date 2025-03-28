@@ -11,6 +11,7 @@ import Coins from "./pages/Coins";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import StoryPage from "./pages/StoryPage";
+import Auth from "./pages/Auth";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/coins" element={<Coins />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/story/:id" element={<StoryPage />} />
+          <Route path="/auth" element={<Auth />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
