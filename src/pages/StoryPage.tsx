@@ -235,8 +235,8 @@ const StoryPage = () => {
           </div>
         </div>
         
-        {/* Enhanced chapter title display */}
-        <div className="bg-black py-6 text-center mb-6">
+        {/* Enhanced chapter title display - reduced top padding from py-6 to py-3 */}
+        <div className="bg-black py-3 text-center mb-6">
           <h1 className="text-2xl md:text-3xl font-bold text-white">
             {currentChapter.title}
           </h1>
