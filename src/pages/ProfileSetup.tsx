@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,13 +13,27 @@ import { User, Upload, Loader2 } from 'lucide-react';
 
 const ProfileSetup = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
   const [profileData, setProfileData] = useState({
     name: "",
     username: "",
     bio: "",
     avatarUrl: "",
+    email: "",
   });
+
+  // Initialize form with data from signup if available
+  useEffect(() => {
+    if (location.state?.userData) {
+      const { name, email } = location.state.userData;
+      setProfileData(prev => ({
+        ...prev,
+        name: name || "",
+        email: email || "",
+      }));
+    }
+  }, [location.state]);
 
   // Preview the avatar before upload
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
@@ -111,6 +125,22 @@ const ProfileSetup = () => {
                     onChange={handleInputChange}
                     required
                   />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input 
+                    id="email" 
+                    name="email" 
+                    placeholder="Email Anda"
+                    value={profileData.email}
+                    onChange={handleInputChange}
+                    readOnly
+                    className="bg-muted/50"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Email tidak dapat diubah setelah pendaftaran
+                  </p>
                 </div>
                 
                 <div className="space-y-2">

@@ -61,7 +61,15 @@ export const SignupForm = () => {
         description: "Silakan lengkapi profil Anda",
       });
       
-      navigate('/profile-setup');
+      // Pass user data to the profile setup page
+      navigate('/profile-setup', { 
+        state: { 
+          userData: { 
+            name: data.name, 
+            email: data.email 
+          } 
+        } 
+      });
     } catch (error) {
       // Error notification
       toast({
