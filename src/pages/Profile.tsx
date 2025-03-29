@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -8,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from '@/hooks/use-toast';
 import { User, Bookmark, BookOpen, Settings, Pencil, Save, Coins, Heart, Eye } from 'lucide-react';
 import StoryCard from '@/components/story/StoryCard';
 import { stories } from '@/data/stories';
@@ -22,7 +23,7 @@ const Profile = () => {
     name: 'Budi Pratama',
     username: 'budipratama',
     bio: 'Penulis cerita fiksi dan penggemar sastra. Suka menulis cerita tentang petualangan dan misteri.',
-    email: 'budi.pratama@example.com',
+    email: '',
     avatar: 'https://i.pravatar.cc/150?img=32',
     coins: 120,
     joined: 'November 2023',
@@ -98,30 +99,6 @@ const Profile = () => {
                 </div>
               </CardContent>
             </Card>
-            
-            <div className="hidden md:block">
-              <h3 className="font-medium mb-3">Statistik</h3>
-              <Card>
-                <CardContent className="p-4 space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-sm text-muted-foreground">Cerita Diterbitkan</span>
-                    <span className="font-medium">4</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-muted-foreground">Total Pembaca</span>
-                    <span className="font-medium">12,540</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-muted-foreground">Total Likes</span>
-                    <span className="font-medium">892</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-muted-foreground">Chapter Premium</span>
-                    <span className="font-medium">6</span>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
           </div>
           
           <div>
@@ -149,27 +126,34 @@ const Profile = () => {
                   </Button>
                 </div>
                 
-                {stories.length > 0 ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                    {stories.map((story) => (
-                      <StoryCard key={story.id} story={story} />
-                    ))}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
+                  <div className="bg-secondary/40 backdrop-blur-sm rounded-lg p-4 relative overflow-hidden group">
+                    <Badge className="absolute top-2 left-2 z-10">Fiksi Fantasi</Badge>
+                    <div className="relative aspect-[3/4] rounded-md overflow-hidden mb-3">
+                      <img 
+                        src={stories[0].cover} 
+                        alt="Book cover" 
+                        className="w-full h-full object-cover transition-transform group-hover:scale-105" 
+                      />
+                    </div>
                   </div>
-                ) : (
-                  <div className="bg-secondary/40 backdrop-blur-sm rounded-lg border border-border p-8 text-center">
-                    <BookOpen size={48} className="mx-auto text-muted-foreground mb-4" />
-                    <h3 className="text-xl font-medium mb-2">Belum Ada Cerita</h3>
-                    <p className="text-muted-foreground mb-4">
-                      Anda belum menerbitkan cerita. Mulai menulis dan bagikan kreativitas anda dengan dunia!
-                    </p>
-                    <Button asChild>
-                      <Link to="/publish">
-                        <Pencil size={16} className="mr-2" />
-                        Tulis Cerita Pertama
-                      </Link>
-                    </Button>
+                  
+                  <div className="bg-secondary/40 backdrop-blur-sm rounded-lg p-4 relative overflow-hidden group">
+                    <Badge className="absolute top-2 left-2 z-10">Techno Thriller</Badge>
+                    <div className="relative aspect-[3/4] rounded-md overflow-hidden mb-3">
+                      <img 
+                        src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
+                        alt="Book cover" 
+                        className="w-full h-full object-cover transition-transform group-hover:scale-105" 
+                      />
+                    </div>
                   </div>
-                )}
+                </div>
+                
+                <div className="bg-black/80 text-white mt-6 p-4 rounded-lg text-center">
+                  <p className="text-lg font-semibold">Profil berhasil dibuat</p>
+                  <p>Selamat datang di CeritaKita!</p>
+                </div>
               </TabsContent>
               
               <TabsContent value="bookmarks" className="mt-0">
@@ -177,25 +161,18 @@ const Profile = () => {
                   <h2 className="text-xl font-bold">Bookmark</h2>
                 </div>
                 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                  {stories.slice(0, 2).map((story) => (
-                    <div key={story.id} className="relative group">
-                      <StoryCard story={story} />
-                      <Button 
-                        variant="ghost" 
-                        size="icon"
-                        className="absolute top-2 right-2 bg-black/40 backdrop-blur-sm hover:bg-black/60 text-white border border-white/10"
-                        onClick={() => {
-                          toast({
-                            title: "Bookmark Dihapus",
-                            description: `"${story.title}" telah dihapus dari bookmark anda.`,
-                          });
-                        }}
-                      >
-                        <Bookmark size={16} className="fill-current" />
-                      </Button>
-                    </div>
-                  ))}
+                <div className="bg-secondary/40 backdrop-blur-sm rounded-lg border border-border p-8 text-center">
+                  <Bookmark size={48} className="mx-auto text-muted-foreground mb-4" />
+                  <h3 className="text-xl font-medium mb-2">Belum Ada Bookmark</h3>
+                  <p className="text-muted-foreground mb-4">
+                    Anda belum menyimpan cerita apapun ke dalam bookmark.
+                  </p>
+                  <Button asChild>
+                    <Link to="/search">
+                      <BookOpen size={16} className="mr-2" />
+                      Jelajahi Cerita
+                    </Link>
+                  </Button>
                 </div>
               </TabsContent>
               
@@ -255,16 +232,6 @@ const Profile = () => {
                       </div>
                       
                       <div className="space-y-2">
-                        <Label htmlFor="email">Email</Label>
-                        <Input 
-                          id="email" 
-                          type="email" 
-                          value={userData.email}
-                          onChange={(e) => setUserData({ ...userData, email: e.target.value })}
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
                         <Label htmlFor="bio">Bio</Label>
                         <Textarea 
                           id="bio" 
@@ -302,11 +269,6 @@ const Profile = () => {
                             <h3 className="text-sm font-medium text-muted-foreground">Username</h3>
                             <p>@{userData.username}</p>
                           </div>
-                          
-                          <div>
-                            <h3 className="text-sm font-medium text-muted-foreground">Email</h3>
-                            <p>{userData.email}</p>
-                          </div>
                         </div>
                         
                         <div className="space-y-4">
@@ -318,43 +280,6 @@ const Profile = () => {
                           <div>
                             <h3 className="text-sm font-medium text-muted-foreground">Bergabung Sejak</h3>
                             <p>{userData.joined}</p>
-                          </div>
-                          
-                          <div>
-                            <h3 className="text-sm font-medium text-muted-foreground">Koin</h3>
-                            <div className="flex items-center gap-1">
-                              <Coins size={16} className="text-yellow-400" />
-                              <p>{userData.coins} Koin</p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="pt-4 border-t border-border">
-                        <h3 className="font-medium mb-3">Statistik</h3>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                          <div className="bg-secondary/40 backdrop-blur-sm rounded-lg p-4 text-center">
-                            <BookOpen size={20} className="mx-auto mb-1" />
-                            <div className="text-2xl font-bold">4</div>
-                            <div className="text-xs text-muted-foreground">Cerita</div>
-                          </div>
-                          
-                          <div className="bg-secondary/40 backdrop-blur-sm rounded-lg p-4 text-center">
-                            <Eye size={20} className="mx-auto mb-1" />
-                            <div className="text-2xl font-bold">12,540</div>
-                            <div className="text-xs text-muted-foreground">Pembaca</div>
-                          </div>
-                          
-                          <div className="bg-secondary/40 backdrop-blur-sm rounded-lg p-4 text-center">
-                            <Heart size={20} className="mx-auto mb-1 text-red-500" />
-                            <div className="text-2xl font-bold">892</div>
-                            <div className="text-xs text-muted-foreground">Likes</div>
-                          </div>
-                          
-                          <div className="bg-secondary/40 backdrop-blur-sm rounded-lg p-4 text-center">
-                            <Bookmark size={20} className="mx-auto mb-1" />
-                            <div className="text-2xl font-bold">16</div>
-                            <div className="text-xs text-muted-foreground">Bookmark</div>
                           </div>
                         </div>
                       </div>
