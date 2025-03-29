@@ -8,27 +8,62 @@ import { Button } from "@/components/ui/button";
 import { LoginForm } from '@/components/auth/LoginForm';
 import { SignupForm } from '@/components/auth/SignupForm';
 import { BookOpen } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
 
 const Auth = () => {
   const [activeTab, setActiveTab] = useState<"login" | "signup">("login");
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Check for tab query parameter on mount
-  useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
-    const tabParam = searchParams.get('tab');
-    if (tabParam === 'signup') {
-      setActiveTab('signup');
-    }
-  }, [location.search]);
+  // Handle login success
+  const handleLoginSuccess = (userData: any) => {
+    // Store user data in session storage
+    sessionStorage.setItem('userData', JSON.stringify(userData));
+    
+    // Show success toast
+    toast({
+      title: "Login Berhasil",
+      description: "Selamat datang kembali di CeritaKita!"
+    });
+    
+    // Redirect to profile page
+    navigate('/profile');
+  };
 
-  // This is a demo function - in a real app, this would be replaced with actual auth logic
+  // Handle signup success
+  const handleSignupSuccess = (userData: any) => {
+    // Store user data in session storage
+    sessionStorage.setItem('userData', JSON.stringify(userData));
+    
+    // Redirect to profile setup page
+    navigate('/profile-setup');
+  };
+
+  // Check for tab query parameter or location state on mount
+  useEffect(() => {
+    // Check for state passed from navigation
+    if (location.state && location.state.activeTab) {
+      setActiveTab(location.state.activeTab);
+    } else {
+      // Check for URL param if no state
+      const searchParams = new URLSearchParams(location.search);
+      const tabParam = searchParams.get('tab');
+      if (tabParam === 'signup') {
+        setActiveTab('signup');
+      }
+    }
+  }, [location]);
+
+  // This is a demo function for social login
   const handleDemoLogin = () => {
-    // Simulate login and redirect
-    setTimeout(() => {
-      navigate('/');
-    }, 1000);
+    const mockUserData = {
+      id: 'user-123',
+      name: 'User Demo',
+      email: 'user@example.com',
+      avatar: 'https://i.pravatar.cc/150?img=32'
+    };
+    
+    handleLoginSuccess(mockUserData);
   };
 
   return (
@@ -57,7 +92,7 @@ const Auth = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <LoginForm />
+                <LoginForm onSuccess={handleLoginSuccess} />
               </CardContent>
               <CardFooter className="flex flex-col gap-2">
                 <div className="relative w-full my-4">
@@ -95,7 +130,7 @@ const Auth = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <SignupForm />
+                <SignupForm onSuccess={handleSignupSuccess} />
               </CardContent>
               <CardFooter className="flex flex-col gap-2">
                 <div className="relative w-full my-4">
