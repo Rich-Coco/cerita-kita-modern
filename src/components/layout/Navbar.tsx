@@ -92,28 +92,12 @@ const Navbar = () => {
         </div>
 
         <div className="flex items-center gap-4">
-          {isAuthenticated ? (
-            <>
-              <Link to="/coins" className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-secondary text-yellow-400">
-                <Coins size={16} />
-                <span className="font-medium">120</span>
-              </Link>
-              
-              <Link to="/">
-                <Avatar className="border-2 border-primary transition-all hover:border-accent hover:scale-105">
-                  <AvatarImage src="https://i.pravatar.cc/150?img=32" />
-                  <AvatarFallback>BP</AvatarFallback>
-                </Avatar>
-              </Link>
-            </>
-          ) : (
-            <div className="hidden md:flex items-center gap-2">
-              <Button onClick={() => handleAuthNavigation('signup')} className="relative overflow-hidden group">
-                <span className="relative z-10">Masuk</span>
-                <span className="absolute inset-0 bg-gradient-to-r from-primary to-accent opacity-90 group-hover:opacity-100 transition-opacity" />
-              </Button>
-            </div>
-          )}
+          <div className="hidden md:flex items-center gap-2">
+            <Button onClick={() => handleAuthNavigation('login')} className="relative overflow-hidden group">
+              <span className="relative z-10">Masuk</span>
+              <span className="absolute inset-0 bg-gradient-to-r from-primary to-accent opacity-90 group-hover:opacity-100 transition-opacity" />
+            </Button>
+          </div>
 
           <Button variant="outline" size="icon" className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
             {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -126,14 +110,14 @@ const Navbar = () => {
           <nav className="flex flex-col gap-2">
             {navItems.map(item => <NavItem key={item.to} to={item.to} icon={item.icon} label={item.label} isActive={location.pathname === item.to} />)}
             
-            {!isAuthenticated && <div className="flex flex-col gap-2 pt-4 border-t border-border mt-2">
-                <Button onClick={() => handleAuthNavigation('login')} variant="outline">
-                  Masuk
-                </Button>
-                <Button onClick={() => handleAuthNavigation('signup')}>
-                  Daftar
-                </Button>
-              </div>}
+            <div className="flex flex-col gap-2 pt-4 border-t border-border mt-2">
+              <Button onClick={() => handleAuthNavigation('login')} variant="outline">
+                Masuk
+              </Button>
+              <Button onClick={() => handleAuthNavigation('signup')}>
+                Daftar
+              </Button>
+            </div>
           </nav>
         </div>}
     </header>;
