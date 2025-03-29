@@ -29,7 +29,11 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-export const SignupForm = () => {
+interface SignupFormProps {
+  onSuccess?: (userData: any) => void;
+}
+
+export const SignupForm = ({ onSuccess }: SignupFormProps) => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -55,21 +59,34 @@ export const SignupForm = () => {
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      // Success notification and redirect to profile setup
+      // Mock user data that would come from API
+      const userData = {
+        id: 'new-user-123',
+        name: data.name,
+        email: data.email,
+        avatar: 'https://i.pravatar.cc/150?img=32'
+      };
+      
+      // Success notification
       toast({
         title: "Pendaftaran berhasil",
         description: "Silakan lengkapi profil Anda",
       });
       
-      // Pass user data to the profile setup page
-      navigate('/profile-setup', { 
-        state: { 
-          userData: { 
-            name: data.name, 
-            email: data.email 
+      // Call the onSuccess callback if provided
+      if (onSuccess) {
+        onSuccess(userData);
+      } else {
+        // Pass user data to the profile setup page
+        navigate('/profile-setup', { 
+          state: { 
+            userData: { 
+              name: data.name, 
+              email: data.email 
+            } 
           } 
-        } 
-      });
+        });
+      }
     } catch (error) {
       // Error notification
       toast({
