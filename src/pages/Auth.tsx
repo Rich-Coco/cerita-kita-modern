@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -8,66 +7,28 @@ import { Button } from "@/components/ui/button";
 import { LoginForm } from '@/components/auth/LoginForm';
 import { SignupForm } from '@/components/auth/SignupForm';
 import { BookOpen } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
-
 const Auth = () => {
   const [activeTab, setActiveTab] = useState<"login" | "signup">("login");
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Handle login success
-  const handleLoginSuccess = (userData: any) => {
-    // Store user data in session storage
-    sessionStorage.setItem('userData', JSON.stringify(userData));
-    
-    // Show success toast
-    toast({
-      title: "Login Berhasil",
-      description: "Selamat datang kembali di CeritaKita!"
-    });
-    
-    // Redirect to profile page
-    navigate('/profile');
-  };
-
-  // Handle signup success
-  const handleSignupSuccess = (userData: any) => {
-    // Store user data in session storage
-    sessionStorage.setItem('userData', JSON.stringify(userData));
-    
-    // Redirect to profile setup page
-    navigate('/profile-setup');
-  };
-
-  // Check for tab query parameter or location state on mount
+  // Check for tab query parameter on mount
   useEffect(() => {
-    // Check for state passed from navigation
-    if (location.state && location.state.activeTab) {
-      setActiveTab(location.state.activeTab);
-    } else {
-      // Check for URL param if no state
-      const searchParams = new URLSearchParams(location.search);
-      const tabParam = searchParams.get('tab');
-      if (tabParam === 'signup') {
-        setActiveTab('signup');
-      }
+    const searchParams = new URLSearchParams(location.search);
+    const tabParam = searchParams.get('tab');
+    if (tabParam === 'signup') {
+      setActiveTab('signup');
     }
-  }, [location]);
+  }, [location.search]);
 
-  // This is a demo function for social login
+  // This is a demo function - in a real app, this would be replaced with actual auth logic
   const handleDemoLogin = () => {
-    const mockUserData = {
-      id: 'user-123',
-      name: 'User Demo',
-      email: 'user@example.com',
-      avatar: 'https://i.pravatar.cc/150?img=32'
-    };
-    
-    handleLoginSuccess(mockUserData);
+    // Simulate login and redirect
+    setTimeout(() => {
+      navigate('/');
+    }, 1000);
   };
-
-  return (
-    <MainLayout>
+  return <MainLayout>
       <div className="container max-w-md mx-auto py-10 px-4">
         <div className="flex flex-col items-center justify-center mb-8">
           <BookOpen className="h-12 w-12 text-primary mb-2" />
@@ -77,7 +38,7 @@ const Auth = () => {
           </p>
         </div>
 
-        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "login" | "signup")} className="w-full">
+        <Tabs value={activeTab} onValueChange={value => setActiveTab(value as "login" | "signup")} className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-6">
             <TabsTrigger value="login">Masuk</TabsTrigger>
             <TabsTrigger value="signup">Daftar</TabsTrigger>
@@ -92,7 +53,7 @@ const Auth = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <LoginForm onSuccess={handleLoginSuccess} />
+                <LoginForm />
               </CardContent>
               <CardFooter className="flex flex-col gap-2">
                 <div className="relative w-full my-4">
@@ -104,18 +65,10 @@ const Auth = () => {
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2 w-full">
-                  <Button 
-                    variant="outline" 
-                    onClick={handleDemoLogin}
-                    className="bg-background border-border hover:bg-secondary"
-                  >
+                  <Button variant="outline" onClick={handleDemoLogin} className="bg-background border-border hover:bg-secondary">
                     Google
                   </Button>
-                  <Button 
-                    variant="outline" 
-                    onClick={handleDemoLogin}
-                    className="bg-background border-border hover:bg-secondary"
-                  >
+                  <Button variant="outline" onClick={handleDemoLogin} className="bg-background border-border hover:bg-secondary">
                     Facebook
                   </Button>
                 </div>
@@ -129,9 +82,7 @@ const Auth = () => {
                   Gabung komunitas pembaca dan penulis Indonesia
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <SignupForm onSuccess={handleSignupSuccess} />
-              </CardContent>
+              
               <CardFooter className="flex flex-col gap-2">
                 <div className="relative w-full my-4">
                   <div className="absolute inset-0 flex items-center">
@@ -142,18 +93,10 @@ const Auth = () => {
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2 w-full">
-                  <Button 
-                    variant="outline" 
-                    onClick={handleDemoLogin}
-                    className="bg-background border-border hover:bg-secondary"
-                  >
+                  <Button variant="outline" onClick={handleDemoLogin} className="bg-background border-border hover:bg-secondary">
                     Google
                   </Button>
-                  <Button 
-                    variant="outline" 
-                    onClick={handleDemoLogin}
-                    className="bg-background border-border hover:bg-secondary"
-                  >
+                  <Button variant="outline" onClick={handleDemoLogin} className="bg-background border-border hover:bg-secondary">
                     Facebook
                   </Button>
                 </div>
@@ -162,8 +105,6 @@ const Auth = () => {
           </Card>
         </Tabs>
       </div>
-    </MainLayout>
-  );
+    </MainLayout>;
 };
-
 export default Auth;

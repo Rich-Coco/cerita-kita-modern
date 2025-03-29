@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -9,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Eye, EyeOff, Loader2 } from 'lucide-react';
-
 const formSchema = z.object({
   email: z.string().email({
     message: "Harap masukkan email yang valid"
@@ -18,19 +16,14 @@ const formSchema = z.object({
     message: "Password minimal 8 karakter"
   })
 });
-
 type FormValues = z.infer<typeof formSchema>;
-
-interface LoginFormProps {
-  onSuccess?: (userData: any) => void;
-}
-
-export const LoginForm = ({ onSuccess }: LoginFormProps) => {
-  const { toast } = useToast();
+export const LoginForm = () => {
+  const {
+    toast
+  } = useToast();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -38,12 +31,10 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
       password: ""
     }
   });
-  
   const handleRedirectToSignup = () => {
     // This will redirect to signup tab
     window.location.href = '/auth?tab=signup';
   };
-  
   const onSubmit = async (data: FormValues) => {
     setIsLoading(true);
     try {
@@ -53,26 +44,12 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 1500));
 
-      // Mock user data that would come from API
-      const userData = {
-        id: 'user-123',
-        name: 'User Demo',
-        email: data.email,
-        avatar: 'https://i.pravatar.cc/150?img=32'
-      };
-
-      // Success notification
+      // Success notification and redirect to profile page
       toast({
         title: "Login berhasil",
         description: "Selamat datang kembali!"
       });
-      
-      // Call the onSuccess callback if provided
-      if (onSuccess) {
-        onSuccess(userData);
-      } else {
-        navigate('/');
-      }
+      navigate('/profile');
     } catch (error) {
       // Error notification
       toast({
@@ -84,29 +61,21 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
       setIsLoading(false);
     }
   };
-  
-  return (
-    <Form {...form}>
+  return <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
+        <FormField control={form.control} name="email" render={({
+        field
+      }) => <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
                 <Input placeholder="emailmu@contoh.com" {...field} />
               </FormControl>
               <FormMessage />
-            </FormItem>
-          )}
-        />
+            </FormItem>} />
         
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
+        <FormField control={form.control} name="password" render={({
+        field
+      }) => <FormItem>
               <FormLabel>Password</FormLabel>
               <div className="relative">
                 <FormControl>
@@ -117,9 +86,7 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
                 </Button>
               </div>
               <FormMessage />
-            </FormItem>
-          )}
-        />
+            </FormItem>} />
         
         <div className="text-sm">
           <a href="#" className="text-primary hover:text-primary/90">
@@ -128,14 +95,13 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
         </div>
         
         <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? (
-            <>
+          {isLoading ? <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Memproses...
-            </>
-          ) : "Masuk"}
+            </> : "Masuk"}
         </Button>
+        
+        
       </form>
-    </Form>
-  );
+    </Form>;
 };
