@@ -125,6 +125,21 @@ export const LoginForm = () => {
         </div>
         
         <Button 
+          type="submit" 
+          className="w-full"
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Memproses...
+            </>
+          ) : (
+            "Masuk"
+          )}
+        </Button>
+        
+        <Button 
           type="button" 
           className="w-full" 
           onClick={handleRedirectToSignup}
