@@ -38,11 +38,6 @@ export const LoginForm = () => {
     },
   });
 
-  const handleRedirectToSignup = () => {
-    // This will redirect to signup tab
-    window.location.href = '/auth?tab=signup';
-  };
-
   const onSubmit = async (data: FormValues) => {
     setIsLoading(true);
     
@@ -124,12 +119,15 @@ export const LoginForm = () => {
           </a>
         </div>
         
-        <Button 
-          type="button" 
-          className="w-full" 
-          onClick={handleRedirectToSignup}
-        >
-          Daftar Sekarang
+        <Button type="submit" className="w-full" disabled={isLoading}>
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Memproses...
+            </>
+          ) : (
+            "Masuk"
+          )}
         </Button>
       </form>
     </Form>

@@ -1,6 +1,6 @@
 
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,16 +12,6 @@ import { BookOpen } from 'lucide-react';
 const Auth = () => {
   const [activeTab, setActiveTab] = useState<"login" | "signup">("login");
   const navigate = useNavigate();
-  const location = useLocation();
-
-  // Check for tab query parameter on mount
-  useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
-    const tabParam = searchParams.get('tab');
-    if (tabParam === 'signup') {
-      setActiveTab('signup');
-    }
-  }, [location.search]);
 
   // This is a demo function - in a real app, this would be replaced with actual auth logic
   const handleDemoLogin = () => {
