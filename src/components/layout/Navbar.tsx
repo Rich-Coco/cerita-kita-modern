@@ -99,7 +99,7 @@ const Navbar = () => {
                 <span className="font-medium">120</span>
               </Link>
               
-              <Link to="/profile">
+              <Link to="/">
                 <Avatar className="border-2 border-primary transition-all hover:border-accent hover:scale-105">
                   <AvatarImage src="https://i.pravatar.cc/150?img=32" />
                   <AvatarFallback>BP</AvatarFallback>

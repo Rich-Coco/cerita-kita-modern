@@ -71,7 +71,7 @@ export const LoginForm = ({ onSuccess }: LoginFormProps) => {
       if (onSuccess) {
         onSuccess(userData);
       } else {
-        navigate('/profile');
+        navigate('/');
       }
     } catch (error) {
       // Error notification
