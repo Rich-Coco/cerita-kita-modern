@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -9,7 +8,6 @@ import { LoginForm } from '@/components/auth/LoginForm';
 import { SignupForm } from '@/components/auth/SignupForm';
 import { BookOpen } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
-
 const Auth = () => {
   const [activeTab, setActiveTab] = useState<"login" | "signup">("login");
   const navigate = useNavigate();
@@ -19,13 +17,13 @@ const Auth = () => {
   const handleLoginSuccess = (userData: any) => {
     // Store user data in session storage
     sessionStorage.setItem('userData', JSON.stringify(userData));
-    
+
     // Show success toast
     toast({
       title: "Login Berhasil",
       description: "Selamat datang kembali di CeritaKita!"
     });
-    
+
     // Redirect to profile page
     navigate('/profile');
   };
@@ -34,7 +32,7 @@ const Auth = () => {
   const handleSignupSuccess = (userData: any) => {
     // Store user data in session storage
     sessionStorage.setItem('userData', JSON.stringify(userData));
-    
+
     // Redirect to profile setup page
     navigate('/profile-setup');
   };
@@ -62,12 +60,9 @@ const Auth = () => {
       email: 'user@example.com',
       avatar: 'https://i.pravatar.cc/150?img=32'
     };
-    
     handleLoginSuccess(mockUserData);
   };
-
-  return (
-    <MainLayout>
+  return <MainLayout>
       <div className="container max-w-md mx-auto py-10 px-4">
         <div className="flex flex-col items-center justify-center mb-8">
           <BookOpen className="h-12 w-12 text-primary mb-2" />
@@ -77,7 +72,7 @@ const Auth = () => {
           </p>
         </div>
 
-        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "login" | "signup")} className="w-full">
+        <Tabs value={activeTab} onValueChange={value => setActiveTab(value as "login" | "signup")} className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-6">
             <TabsTrigger value="login">Masuk</TabsTrigger>
             <TabsTrigger value="signup">Daftar</TabsTrigger>
@@ -94,32 +89,7 @@ const Auth = () => {
               <CardContent>
                 <LoginForm onSuccess={handleLoginSuccess} />
               </CardContent>
-              <CardFooter className="flex flex-col gap-2">
-                <div className="relative w-full my-4">
-                  <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t border-border"></span>
-                  </div>
-                  <div className="relative flex justify-center text-xs">
-                    <span className="bg-card px-2 text-muted-foreground">Atau lanjutkan dengan</span>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-2 w-full">
-                  <Button 
-                    variant="outline" 
-                    onClick={handleDemoLogin}
-                    className="bg-background border-border hover:bg-secondary"
-                  >
-                    Google
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    onClick={handleDemoLogin}
-                    className="bg-background border-border hover:bg-secondary"
-                  >
-                    Facebook
-                  </Button>
-                </div>
-              </CardFooter>
+              
             </TabsContent>
             
             <TabsContent value="signup" className="mt-0">
@@ -132,38 +102,11 @@ const Auth = () => {
               <CardContent>
                 <SignupForm onSuccess={handleSignupSuccess} />
               </CardContent>
-              <CardFooter className="flex flex-col gap-2">
-                <div className="relative w-full my-4">
-                  <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t border-border"></span>
-                  </div>
-                  <div className="relative flex justify-center text-xs">
-                    <span className="bg-card px-2 text-muted-foreground">Atau daftar dengan</span>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-2 w-full">
-                  <Button 
-                    variant="outline" 
-                    onClick={handleDemoLogin}
-                    className="bg-background border-border hover:bg-secondary"
-                  >
-                    Google
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    onClick={handleDemoLogin}
-                    className="bg-background border-border hover:bg-secondary"
-                  >
-                    Facebook
-                  </Button>
-                </div>
-              </CardFooter>
+              
             </TabsContent>
           </Card>
         </Tabs>
       </div>
-    </MainLayout>
-  );
+    </MainLayout>;
 };
-
 export default Auth;
