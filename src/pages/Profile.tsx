@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -14,11 +13,9 @@ import { User, Bookmark, BookOpen, Settings, Pencil, Save, Coins, Heart, Eye } f
 import StoryCard from '@/components/story/StoryCard';
 import { stories } from '@/data/stories';
 import MainLayout from '@/components/layout/MainLayout';
-
 const Profile = () => {
   const [profileTab, setProfileTab] = useState('stories');
   const [isEditing, setIsEditing] = useState(false);
-  
   const [userData, setUserData] = useState({
     name: 'Budi Pratama',
     username: 'budipratama',
@@ -26,20 +23,17 @@ const Profile = () => {
     email: '',
     avatar: 'https://i.pravatar.cc/150?img=32',
     coins: 120,
-    joined: 'November 2023',
+    joined: 'November 2023'
   });
-  
   const handleProfileUpdate = (e: React.FormEvent) => {
     e.preventDefault();
     toast({
       title: "Profil Diperbarui",
-      description: "Informasi profil anda telah berhasil diperbarui.",
+      description: "Informasi profil anda telah berhasil diperbarui."
     });
     setIsEditing(false);
   };
-  
-  return (
-    <MainLayout>
+  return <MainLayout>
       <div className="py-8 md:py-12 max-w-7xl mx-auto px-4 md:px-6">
         <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-8">
           <div className="space-y-6">
@@ -58,13 +52,9 @@ const Profile = () => {
                     <p className="text-muted-foreground">@{userData.username}</p>
                     
                     <div className="flex items-center justify-center gap-2 mt-2">
-                      <Badge variant="outline" className="bg-black/20">
-                        <BookOpen size={12} className="mr-1" /> Penulis
-                      </Badge>
                       
-                      <Badge variant="outline" className="bg-black/20 text-yellow-400">
-                        <Coins size={12} className="mr-1" /> {userData.coins}
-                      </Badge>
+                      
+                      
                     </div>
                   </div>
                   
@@ -130,22 +120,14 @@ const Profile = () => {
                   <div className="bg-secondary/40 backdrop-blur-sm rounded-lg p-4 relative overflow-hidden group">
                     <Badge className="absolute top-2 left-2 z-10">Fiksi Fantasi</Badge>
                     <div className="relative aspect-[3/4] rounded-md overflow-hidden mb-3">
-                      <img 
-                        src={stories[0].cover} 
-                        alt="Book cover" 
-                        className="w-full h-full object-cover transition-transform group-hover:scale-105" 
-                      />
+                      <img src={stories[0].cover} alt="Book cover" className="w-full h-full object-cover transition-transform group-hover:scale-105" />
                     </div>
                   </div>
                   
                   <div className="bg-secondary/40 backdrop-blur-sm rounded-lg p-4 relative overflow-hidden group">
                     <Badge className="absolute top-2 left-2 z-10">Techno Thriller</Badge>
                     <div className="relative aspect-[3/4] rounded-md overflow-hidden mb-3">
-                      <img 
-                        src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
-                        alt="Book cover" 
-                        className="w-full h-full object-cover transition-transform group-hover:scale-105" 
-                      />
+                      <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Book cover" className="w-full h-full object-cover transition-transform group-hover:scale-105" />
                     </div>
                   </div>
                 </div>
@@ -180,21 +162,14 @@ const Profile = () => {
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-bold">Pengaturan Profil</h2>
                   
-                  {!isEditing && (
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => setIsEditing(true)}
-                    >
+                  {!isEditing && <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
                       <Pencil size={16} className="mr-2" />
                       Edit Profil
-                    </Button>
-                  )}
+                    </Button>}
                 </div>
                 
                 <div className="bg-card rounded-lg border border-border p-6">
-                  {isEditing ? (
-                    <form onSubmit={handleProfileUpdate} className="space-y-4">
+                  {isEditing ? <form onSubmit={handleProfileUpdate} className="space-y-4">
                       <div className="flex justify-center mb-4">
                         <div className="relative">
                           <Avatar className="h-24 w-24 border-2 border-primary">
@@ -202,10 +177,7 @@ const Profile = () => {
                             <AvatarFallback>BP</AvatarFallback>
                           </Avatar>
                           
-                          <Button 
-                            size="icon" 
-                            className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full"
-                          >
+                          <Button size="icon" className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full">
                             <Pencil size={14} />
                           </Button>
                         </div>
@@ -214,39 +186,31 @@ const Profile = () => {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <Label htmlFor="name">Nama</Label>
-                          <Input 
-                            id="name" 
-                            value={userData.name}
-                            onChange={(e) => setUserData({ ...userData, name: e.target.value })}
-                          />
+                          <Input id="name" value={userData.name} onChange={e => setUserData({
+                        ...userData,
+                        name: e.target.value
+                      })} />
                         </div>
                         
                         <div className="space-y-2">
                           <Label htmlFor="username">Username</Label>
-                          <Input 
-                            id="username" 
-                            value={userData.username}
-                            onChange={(e) => setUserData({ ...userData, username: e.target.value })}
-                          />
+                          <Input id="username" value={userData.username} onChange={e => setUserData({
+                        ...userData,
+                        username: e.target.value
+                      })} />
                         </div>
                       </div>
                       
                       <div className="space-y-2">
                         <Label htmlFor="bio">Bio</Label>
-                        <Textarea 
-                          id="bio" 
-                          value={userData.bio}
-                          onChange={(e) => setUserData({ ...userData, bio: e.target.value })}
-                          className="min-h-32"
-                        />
+                        <Textarea id="bio" value={userData.bio} onChange={e => setUserData({
+                      ...userData,
+                      bio: e.target.value
+                    })} className="min-h-32" />
                       </div>
                       
                       <div className="flex justify-end gap-2">
-                        <Button 
-                          type="button" 
-                          variant="outline"
-                          onClick={() => setIsEditing(false)}
-                        >
+                        <Button type="button" variant="outline" onClick={() => setIsEditing(false)}>
                           Batal
                         </Button>
                         
@@ -255,9 +219,7 @@ const Profile = () => {
                           Simpan Perubahan
                         </Button>
                       </div>
-                    </form>
-                  ) : (
-                    <div className="space-y-6">
+                    </form> : <div className="space-y-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-4">
                           <div>
@@ -283,16 +245,13 @@ const Profile = () => {
                           </div>
                         </div>
                       </div>
-                    </div>
-                  )}
+                    </div>}
                 </div>
               </TabsContent>
             </Tabs>
           </div>
         </div>
       </div>
-    </MainLayout>
-  );
+    </MainLayout>;
 };
-
 export default Profile;
