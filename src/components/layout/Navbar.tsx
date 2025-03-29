@@ -90,7 +90,7 @@ const Navbar = () => {
             </> : <div className="hidden md:flex items-center gap-2">
               
               <Button onClick={() => handleAuthNavigation('signup')} className="relative overflow-hidden group">
-                <span className="relative z-10">Daftar</span>
+                <span className="relative z-10">Masuk</span>
                 <span className="absolute inset-0 bg-gradient-to-r from-primary to-accent opacity-90 group-hover:opacity-100 transition-opacity" />
               </Button>
             </div>}
