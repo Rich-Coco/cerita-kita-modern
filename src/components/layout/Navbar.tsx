@@ -88,7 +88,7 @@ const Navbar = () => {
       <div className="flex items-center justify-between h-16 max-w-7xl mx-auto">
         <div className="flex items-center gap-6">
           <Link to="/" className="flex items-center gap-2">
-            <img src="/lovable-uploads/6dad1c2d-8896-4f44-a42b-bb2bc2a43a99.png" alt="Hunt Logo" className="h-8 w-8 text-primary object-contain" />
+            <img alt="Hunt Logo" className="h-12 w-12 text-primary object-cover" src="/lovable-uploads/5fa71ae6-ef70-42af-8a69-439aee92f24a.png" />
             <span className="font-bold text-xl tracking-tight">Hunt</span>
           </Link>
           
