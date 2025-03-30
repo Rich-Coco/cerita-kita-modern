@@ -10,7 +10,7 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-4">
             <Link to="/" className="flex items-center gap-2">
-              <img src="/lovable-uploads/f6c0a672-2cb0-400f-a28c-5c3264175ea2.png" alt="Hunt Logo" className="h-6 w-6 text-primary" />
+              <img src="/lovable-uploads/69b15794-2b9b-4f5f-8b89-7fe187efd4a4.png" alt="Hunt Logo" className="h-6 w-6 text-primary" />
               <span className="font-bold text-xl tracking-tight">Hunt</span>
             </Link>
             <p className="text-muted-foreground max-w-md">
