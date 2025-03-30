@@ -1,16 +1,13 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Heart } from 'lucide-react';
-
 const Footer = () => {
-  return (
-    <footer className="bg-black border-t border-white/5 py-8 px-4 md:px-6">
+  return <footer className="bg-black border-t border-white/5 py-8 px-4 md:px-6">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-4">
             <Link to="/" className="flex items-center gap-2">
-              <img src="/lovable-uploads/6dad1c2d-8896-4f44-a42b-bb2bc2a43a99.png" alt="Hunt Logo" className="h-6 w-6 text-primary" />
+              <img alt="Hunt Logo" src="/lovable-uploads/bcc00d43-2cf1-4768-9f93-45bf4e058eb7.png" className="h-12 w-12 text-primary object-fill" />
               <span className="font-bold text-xl tracking-tight">Hunt</span>
             </Link>
             <p className="text-muted-foreground max-w-md">
@@ -57,8 +54,6 @@ const Footer = () => {
           </p>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 };
-
 export default Footer;
