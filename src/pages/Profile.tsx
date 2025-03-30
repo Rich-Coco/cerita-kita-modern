@@ -10,16 +10,18 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/hooks/use-toast';
-import { User, Bookmark, BookOpen, Settings, Pencil, Save, Coins, Heart, Eye } from 'lucide-react';
+import { User, Bookmark, BookOpen, Settings, Pencil, Save, Coins, Heart, Eye, Upload, Loader2 } from 'lucide-react';
 import StoryCard from '@/components/story/StoryCard';
 import { stories } from '@/data/stories';
 import MainLayout from '@/components/layout/MainLayout';
 import { useAuth } from '@/hooks/useAuth';
 import { format } from 'date-fns';
+import { supabase } from '@/integrations/supabase/client';
 
 const Profile = () => {
   const [profileTab, setProfileTab] = useState('stories');
   const [isEditing, setIsEditing] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const { user, profile, updateProfile } = useAuth();
   const [userData, setUserData] = useState({
     name: '',
@@ -30,6 +32,10 @@ const Profile = () => {
     coins: 0,
     joined: ''
   });
+
+  // Avatar file state
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
   // Initialize user data from profile
   useEffect(() => {
@@ -57,23 +63,100 @@ const Profile = () => {
     }
   };
 
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setAvatarFile(file);
+      // Create a preview URL
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatarPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const uploadAvatar = async (): Promise<string | null> => {
+    if (!avatarFile || !user) return null;
+    
+    setIsUploading(true);
+    
+    try {
+      const fileExt = avatarFile.name.split('.').pop();
+      const fileName = `${user.id}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = `avatars/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, avatarFile);
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { data } = supabase.storage.from('avatars').getPublicUrl(filePath);
+      return data.publicUrl;
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+      toast({
+        title: "Error uploading avatar",
+        description: "Please try again later",
+        variant: "destructive"
+      });
+      return null;
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
     
     try {
+      // Upload avatar if changed
+      let avatarUrl = userData.avatar;
+      if (avatarFile) {
+        const newAvatarUrl = await uploadAvatar();
+        if (newAvatarUrl) {
+          avatarUrl = newAvatarUrl;
+        }
+      }
+      
       await updateProfile({
         full_name: userData.name,
         username: userData.username,
         bio: userData.bio,
+        avatar_url: avatarUrl,
       });
       
       setIsEditing(false);
+      setAvatarFile(null);
+      setAvatarPreview(null);
     } catch (error) {
       console.error('Error updating profile:', error);
       toast({
         title: "Update Gagal",
         description: "Terjadi kesalahan saat memperbarui profil",
         variant: "destructive"
+      });
+    }
+  };
+
+  // Reset form when canceling edit
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setAvatarFile(null);
+    setAvatarPreview(null);
+    
+    if (profile) {
+      setUserData({
+        name: profile.full_name || '',
+        username: profile.username || '',
+        bio: profile.bio || '',
+        email: user?.email || '',
+        avatar: profile.avatar_url || '',
+        coins: profile.coins || 0,
+        joined: formatDate(profile.created_at)
       });
     }
   };
@@ -213,13 +296,20 @@ const Profile = () => {
                       <div className="flex justify-center mb-4">
                         <div className="relative">
                           <Avatar className="h-24 w-24 border-2 border-primary">
-                            <AvatarImage src={userData.avatar} />
-                            <AvatarFallback>BP</AvatarFallback>
+                            <AvatarImage src={avatarPreview || userData.avatar} />
+                            <AvatarFallback>{userData.name.charAt(0)}{userData.name.split(' ')[1]?.charAt(0) || ''}</AvatarFallback>
                           </Avatar>
                           
-                          <Button size="icon" className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full">
-                            <Pencil size={14} />
-                          </Button>
+                          <Label htmlFor="avatar-upload" className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full bg-primary text-white flex items-center justify-center cursor-pointer hover:bg-primary/90 transition-colors">
+                            <Upload size={14} />
+                            <Input 
+                              id="avatar-upload" 
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={handleAvatarChange}
+                            />
+                          </Label>
                         </div>
                       </div>
                       
@@ -250,13 +340,22 @@ const Profile = () => {
                       </div>
                       
                       <div className="flex justify-end gap-2">
-                        <Button type="button" variant="outline" onClick={() => setIsEditing(false)}>
+                        <Button type="button" variant="outline" onClick={handleCancelEdit}>
                           Batal
                         </Button>
                         
-                        <Button type="submit">
-                          <Save size={16} className="mr-2" />
-                          Simpan Perubahan
+                        <Button type="submit" disabled={isUploading}>
+                          {isUploading ? (
+                            <>
+                              <Loader2 size={16} className="mr-2 animate-spin" />
+                              Uploading...
+                            </>
+                          ) : (
+                            <>
+                              <Save size={16} className="mr-2" />
+                              Simpan Perubahan
+                            </>
+                          )}
                         </Button>
                       </div>
                     </form> : <div className="space-y-6">
