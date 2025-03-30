@@ -1,196 +1,122 @@
 
 import React, { useState } from 'react';
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate } from 'react-router-dom';
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { useToast } from "@/hooks/use-toast";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Eye, EyeOff, Loader2 } from 'lucide-react';
-
-const formSchema = z.object({
-  name: z.string().min(2, { message: "Nama minimal 2 karakter" }),
-  email: z.string().email({ message: "Harap masukkan email yang valid" }),
-  password: z.string().min(8, { message: "Password minimal 8 karakter" }),
-  termsAccepted: z.boolean().refine(val => val === true, {
-    message: "Anda harus menyetujui syarat dan ketentuan"
-  })
-});
-
-type FormValues = z.infer<typeof formSchema>;
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Loader2 } from "lucide-react";
+import { useAuth } from '@/hooks/useAuth';
 
 interface SignupFormProps {
-  onSuccess?: (userData: any) => void;
+  onSuccess: (userData: any) => void;
 }
 
-export const SignupForm = ({ onSuccess }: SignupFormProps) => {
-  const { toast } = useToast();
-  const navigate = useNavigate();
+export const SignupForm: React.FC<SignupFormProps> = ({ onSuccess }) => {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const { signUp } = useAuth();
 
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      password: "",
-      termsAccepted: false
-    },
-  });
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorMessage('');
 
-  const onSubmit = async (data: FormValues) => {
+    // Validate passwords match
+    if (password !== confirmPassword) {
+      setErrorMessage('Passwords do not match');
+      return;
+    }
+
+    // Validate password strength
+    if (password.length < 6) {
+      setErrorMessage('Password must be at least 6 characters long');
+      return;
+    }
+
     setIsLoading(true);
-    
+
     try {
-      // This is where you would make an API call to register
-      console.log('Signup form submitted with:', data);
-      
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Mock user data that would come from API
-      const userData = {
-        id: 'new-user-123',
-        name: data.name,
-        email: data.email,
-        avatar: 'https://i.pravatar.cc/150?img=32'
-      };
-      
-      // Success notification
-      toast({
-        title: "Pendaftaran berhasil",
-        description: "Silakan lengkapi profil Anda",
+      const data = await signUp(email, password, {
+        full_name: name,
       });
-      
-      // Call the onSuccess callback if provided
-      if (onSuccess) {
-        onSuccess(userData);
-      } else {
-        // Pass user data to the profile setup page
-        navigate('/profile-setup', { 
-          state: { 
-            userData: { 
-              name: data.name, 
-              email: data.email 
-            } 
-          } 
-        });
-      }
-    } catch (error) {
-      // Error notification
-      toast({
-        title: "Pendaftaran gagal",
-        description: "Terjadi kesalahan, silakan coba lagi",
-        variant: "destructive",
-      });
+      onSuccess(data.user);
+    } catch (error: any) {
+      setErrorMessage(error.message || 'Signup failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Nama Lengkap</FormLabel>
-              <FormControl>
-                <Input placeholder="Nama lengkapmu" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="name">Nama Lengkap</Label>
+        <Input
+          id="name"
+          type="text"
+          placeholder="Nama Lengkap"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+          disabled={isLoading}
         />
-        
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input placeholder="emailmu@contoh.com" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="email">Email</Label>
+        <Input
+          id="email"
+          type="email"
+          placeholder="nama@email.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          disabled={isLoading}
         />
-        
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <div className="relative">
-                <FormControl>
-                  <Input 
-                    type={showPassword ? "text" : "password"} 
-                    placeholder="••••••••" 
-                    {...field} 
-                  />
-                </FormControl>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-0 top-0"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                </Button>
-              </div>
-              <FormMessage />
-            </FormItem>
-          )}
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="password">Password</Label>
+        <Input
+          id="password"
+          type="password"
+          placeholder="••••••••"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          disabled={isLoading}
         />
-        
-        <FormField
-          control={form.control}
-          name="termsAccepted"
-          render={({ field }) => (
-            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-              <FormControl>
-                <Checkbox
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
-              </FormControl>
-              <div className="space-y-1 leading-none">
-                <FormLabel className="text-sm font-normal">
-                  Saya menyetujui <a href="#" className="text-primary hover:text-primary/90">syarat dan ketentuan</a> CeritaKita
-                </FormLabel>
-                <FormMessage />
-              </div>
-            </FormItem>
-          )}
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="confirmPassword">Konfirmasi Password</Label>
+        <Input
+          id="confirmPassword"
+          type="password"
+          placeholder="••••••••"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          required
+          disabled={isLoading}
         />
-        
-        <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Memproses...
-            </>
-          ) : (
-            "Daftar"
-          )}
-        </Button>
-      </form>
-    </Form>
+      </div>
+
+      {errorMessage && (
+        <div className="text-destructive text-sm">{errorMessage}</div>
+      )}
+      
+      <Button type="submit" className="w-full" disabled={isLoading}>
+        {isLoading ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" /> 
+            Memproses...
+          </>
+        ) : (
+          'Daftar'
+        )}
+      </Button>
+    </form>
   );
 };

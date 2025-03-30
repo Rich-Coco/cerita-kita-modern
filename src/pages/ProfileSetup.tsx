@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,39 +8,41 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 import { User, Upload, Loader2 } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 
 const ProfileSetup = () => {
   const navigate = useNavigate();
-  const location = useLocation();
+  const { user, profile, updateProfile } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [profileData, setProfileData] = useState({
-    name: "",
     username: "",
+    full_name: "",
     bio: "",
-    avatarUrl: "",
-    email: "",
+    avatar_url: "",
   });
 
-  // Initialize form with data from signup if available
-  useEffect(() => {
-    if (location.state?.userData) {
-      const { name, email } = location.state.userData;
-      setProfileData(prev => ({
-        ...prev,
-        name: name || "",
-        email: email || "",
-      }));
-    }
-  }, [location.state]);
-
   // Preview the avatar before upload
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (profile) {
+      setProfileData({
+        username: profile.username || "",
+        full_name: profile.full_name || "",
+        bio: profile.bio || "",
+        avatar_url: profile.avatar_url || "",
+      });
+    }
+  }, [profile]);
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setAvatarFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setAvatarPreview(reader.result as string);
@@ -57,23 +59,82 @@ const ProfileSetup = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const uploadAvatar = async (): Promise<string | null> => {
+    if (!avatarFile || !user) return null;
+
+    try {
+      const fileExt = avatarFile.name.split('.').pop();
+      const fileName = `${user.id}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = `avatars/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, avatarFile);
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { data } = supabase.storage.from('avatars').getPublicUrl(filePath);
+      return data.publicUrl;
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+      toast({
+        title: "Error uploading avatar",
+        description: "Please try again later",
+        variant: "destructive"
+      });
+      return null;
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) return;
+
     setIsLoading(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      console.log('Profile setup submitted:', profileData);
-      
-      toast({
-        title: "Profil berhasil dibuat",
-        description: "Selamat datang di CeritaKita!",
+    try {
+      // Validate username (required)
+      if (!profileData.username.trim()) {
+        toast({
+          title: "Username required",
+          description: "Please enter a username",
+          variant: "destructive"
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      // Upload avatar if changed
+      let avatarUrl = profileData.avatar_url;
+      if (avatarFile) {
+        const newAvatarUrl = await uploadAvatar();
+        if (newAvatarUrl) {
+          avatarUrl = newAvatarUrl;
+        }
+      }
+
+      // Update profile
+      await updateProfile({
+        username: profileData.username,
+        full_name: profileData.full_name,
+        bio: profileData.bio,
+        avatar_url: avatarUrl,
       });
 
-      // Redirect to profile page
+      // Navigate to profile page
       navigate('/profile');
+    } catch (error: any) {
+      console.error('Error setting up profile:', error);
+      toast({
+        title: "Error setting up profile",
+        description: error.message || "Please try again later",
+        variant: "destructive"
+      });
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   return (
@@ -91,7 +152,7 @@ const ProfileSetup = () => {
               <div className="flex justify-center">
                 <div className="relative">
                   <Avatar className="h-24 w-24 border-2 border-primary">
-                    <AvatarImage src={avatarPreview || ""} />
+                    <AvatarImage src={avatarPreview || profileData.avatar_url} />
                     <AvatarFallback className="bg-primary/20">
                       <User className="h-12 w-12 text-muted-foreground" />
                     </AvatarFallback>
@@ -116,34 +177,6 @@ const ProfileSetup = () => {
               
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Nama Lengkap</Label>
-                  <Input 
-                    id="name" 
-                    name="name" 
-                    placeholder="Nama lengkap Anda"
-                    value={profileData.name}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input 
-                    id="email" 
-                    name="email" 
-                    placeholder="Email Anda"
-                    value={profileData.email}
-                    onChange={handleInputChange}
-                    readOnly
-                    className="bg-muted/50"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Email tidak dapat diubah setelah pendaftaran
-                  </p>
-                </div>
-                
-                <div className="space-y-2">
                   <Label htmlFor="username">Username</Label>
                   <Input 
                     id="username" 
@@ -156,6 +189,17 @@ const ProfileSetup = () => {
                   <p className="text-xs text-muted-foreground">
                     Username akan digunakan sebagai identitas unik Anda
                   </p>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="full_name">Nama Lengkap</Label>
+                  <Input 
+                    id="full_name" 
+                    name="full_name" 
+                    placeholder="Nama lengkap Anda"
+                    value={profileData.full_name}
+                    onChange={handleInputChange}
+                  />
                 </div>
                 
                 <div className="space-y-2">
@@ -176,7 +220,7 @@ const ProfileSetup = () => {
             <Button 
               onClick={handleSubmit}
               className="w-full" 
-              disabled={isLoading || !profileData.name || !profileData.username}
+              disabled={isLoading || !profileData.username}
             >
               {isLoading ? (
                 <>
