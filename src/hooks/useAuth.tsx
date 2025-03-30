@@ -10,8 +10,8 @@ interface AuthContextType {
   user: User | null;
   profile: any | null;
   loading: boolean;
-  signUp: (email: string, password: string, userData: any) => Promise<void>;
-  signIn: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string, userData: any) => Promise<{ user: User | null; session: Session | null; }>;
+  signIn: (email: string, password: string) => Promise<{ user: User | null; session: Session | null; }>;
   signOut: () => Promise<void>;
   updateProfile: (profile: any) => Promise<void>;
 }
@@ -111,7 +111,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: "Silakan lengkapi profil Anda",
       });
       
-      return data;
+      return {
+        user: data.user,
+        session: data.session
+      };
     } catch (error: any) {
       console.error('Error signing up:', error);
       throw error;
@@ -140,7 +143,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: "Selamat datang kembali di CeritaKita!"
       });
       
-      return data;
+      return {
+        user: data.user,
+        session: data.session
+      };
     } catch (error: any) {
       console.error('Error signing in:', error);
       throw error;

@@ -24,7 +24,9 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
 
     try {
       const data = await signIn(email, password);
-      onSuccess(data.user);
+      if (data.user) {
+        onSuccess(data.user);
+      }
     } catch (error: any) {
       setErrorMessage(error.message || 'Login failed. Please try again.');
     } finally {
