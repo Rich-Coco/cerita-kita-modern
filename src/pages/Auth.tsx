@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -6,7 +7,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button";
 import { LoginForm } from '@/components/auth/LoginForm';
 import { SignupForm } from '@/components/auth/SignupForm';
-import { BookOpen } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 const Auth = () => {
@@ -53,7 +53,7 @@ const Auth = () => {
   return <MainLayout>
       <div className="container max-w-md mx-auto py-10 px-4">
         <div className="flex flex-col items-center justify-center mb-8">
-          <BookOpen className="h-12 w-12 text-primary mb-2" />
+          <img src="/lovable-uploads/hunt-logo.png" alt="Hunt Logo" className="h-12 w-12 text-primary mb-2" />
           <h1 className="text-2xl font-bold tracking-tight">Hunt</h1>
           <p className="text-muted-foreground text-center mt-2">
             Gabung dengan komunitas penulis dan pembaca cerita Indonesia

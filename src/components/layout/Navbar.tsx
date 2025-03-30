@@ -1,7 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { Search, BookOpen, Home, User, Coins, Menu, X, LogOut } from 'lucide-react';
+import { Search, Home, User, Coins, Menu, X, LogOut, BookOpen } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
@@ -91,7 +92,7 @@ const Navbar = () => {
       <div className="flex items-center justify-between h-16 max-w-7xl mx-auto">
         <div className="flex items-center gap-6">
           <Link to="/" className="flex items-center gap-2">
-            <BookOpen className="h-8 w-8 text-primary" />
+            <img src="/lovable-uploads/hunt-logo.png" alt="Hunt Logo" className="h-8 w-8 text-primary" />
             <span className="font-bold text-xl tracking-tight">Hunt</span>
           </Link>
           
