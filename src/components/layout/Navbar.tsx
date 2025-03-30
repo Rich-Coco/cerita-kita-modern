@@ -92,7 +92,7 @@ const Navbar = () => {
         <div className="flex items-center gap-6">
           <Link to="/" className="flex items-center gap-2">
             <BookOpen className="h-8 w-8 text-primary" />
-            <span className="font-bold text-xl tracking-tight">CeritaKita</span>
+            <span className="font-bold text-xl tracking-tight">Hunt</span>
           </Link>
           
           <nav className="hidden md:flex items-center gap-1">

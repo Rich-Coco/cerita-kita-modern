@@ -8,42 +8,30 @@ import { LoginForm } from '@/components/auth/LoginForm';
 import { SignupForm } from '@/components/auth/SignupForm';
 import { BookOpen } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+
 const Auth = () => {
   const [activeTab, setActiveTab] = useState<"login" | "signup">("login");
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Handle login success
   const handleLoginSuccess = (userData: any) => {
-    // Store user data in session storage
     sessionStorage.setItem('userData', JSON.stringify(userData));
-
-    // Show success toast
     toast({
       title: "Login Berhasil",
       description: "Selamat datang kembali di CeritaKita!"
     });
-
-    // Redirect to profile page
     navigate('/profile');
   };
 
-  // Handle signup success
   const handleSignupSuccess = (userData: any) => {
-    // Store user data in session storage
     sessionStorage.setItem('userData', JSON.stringify(userData));
-
-    // Redirect to profile setup page
     navigate('/profile-setup');
   };
 
-  // Check for tab query parameter or location state on mount
   useEffect(() => {
-    // Check for state passed from navigation
     if (location.state && location.state.activeTab) {
       setActiveTab(location.state.activeTab);
     } else {
-      // Check for URL param if no state
       const searchParams = new URLSearchParams(location.search);
       const tabParam = searchParams.get('tab');
       if (tabParam === 'signup') {
@@ -52,7 +40,6 @@ const Auth = () => {
     }
   }, [location]);
 
-  // This is a demo function for social login
   const handleDemoLogin = () => {
     const mockUserData = {
       id: 'user-123',
@@ -62,11 +49,12 @@ const Auth = () => {
     };
     handleLoginSuccess(mockUserData);
   };
+
   return <MainLayout>
       <div className="container max-w-md mx-auto py-10 px-4">
         <div className="flex flex-col items-center justify-center mb-8">
           <BookOpen className="h-12 w-12 text-primary mb-2" />
-          <h1 className="text-2xl font-bold tracking-tight">CeritaKita</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Hunt</h1>
           <p className="text-muted-foreground text-center mt-2">
             Gabung dengan komunitas penulis dan pembaca cerita Indonesia
           </p>
@@ -109,4 +97,5 @@ const Auth = () => {
       </div>
     </MainLayout>;
 };
+
 export default Auth;

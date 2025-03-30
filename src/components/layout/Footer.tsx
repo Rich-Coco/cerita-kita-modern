@@ -11,7 +11,7 @@ const Footer = () => {
           <div className="space-y-4">
             <Link to="/" className="flex items-center gap-2">
               <BookOpen className="h-6 w-6 text-primary" />
-              <span className="font-bold text-xl tracking-tight">CeritaKita</span>
+              <span className="font-bold text-xl tracking-tight">Hunt</span>
             </Link>
             <p className="text-muted-foreground max-w-md">
               Platform modern untuk membaca dan menerbitkan cerita dalam Bahasa Indonesia.
@@ -50,7 +50,7 @@ const Footer = () => {
         
         <div className="mt-8 pt-6 border-t border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-sm text-muted-foreground">
-            &copy; {new Date().getFullYear()} CeritaKita. Hak Cipta Dilindungi.
+            &copy; {new Date().getFullYear()} Hunt. Hak Cipta Dilindungi.
           </p>
           <p className="text-sm text-muted-foreground flex items-center gap-1">
             Dibuat dengan <Heart size={14} className="text-red-500" /> di Indonesia
