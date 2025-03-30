@@ -79,6 +79,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (error) {
         console.error('Error fetching profile:', error);
       } else {
+        console.log('Fetched profile data:', data);
         setProfile(data);
       }
     } catch (error) {
@@ -184,6 +185,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     try {
+      console.log('Updating profile with data:', profileData);
+      
       const { error } = await supabase
         .from('profiles')
         .update(profileData)

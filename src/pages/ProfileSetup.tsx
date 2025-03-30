@@ -67,6 +67,21 @@ const ProfileSetup = () => {
       const fileName = `${user.id}-${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = `avatars/${fileName}`;
 
+      // Check if avatars bucket exists, create it if it doesn't
+      const { data: buckets } = await supabase.storage.listBuckets();
+      const avatarBucketExists = buckets?.some(bucket => bucket.name === 'avatars');
+      
+      if (!avatarBucketExists) {
+        const { error: createBucketError } = await supabase.storage.createBucket('avatars', {
+          public: true
+        });
+        
+        if (createBucketError) {
+          console.error('Error creating avatars bucket:', createBucketError);
+          throw createBucketError;
+        }
+      }
+
       const { error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(filePath, avatarFile);
@@ -121,6 +136,11 @@ const ProfileSetup = () => {
         full_name: profileData.full_name,
         bio: profileData.bio,
         avatar_url: avatarUrl,
+      });
+
+      toast({
+        title: "Profile updated",
+        description: "Your profile has been successfully updated",
       });
 
       // Navigate to profile page

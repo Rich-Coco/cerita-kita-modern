@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -41,7 +40,6 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, profile, signOut } = useAuth();
 
-  // Handle login/signup navigation
   const handleAuthNavigation = (type: 'login' | 'signup') => {
     if (type === 'login') {
       navigate('/auth', { state: { activeTab: 'login' } });
@@ -76,7 +74,6 @@ const Navbar = () => {
     label: 'Terbitkan'
   }];
 
-  // Add profile and coins items if user is authenticated
   if (user) {
     navItems.push({
       to: '/profile',
@@ -110,8 +107,15 @@ const Navbar = () => {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                     <Avatar className="h-10 w-10">
-                      <AvatarImage src={profile?.avatar_url} alt={profile?.username || user.email} />
-                      <AvatarFallback>{profile?.username?.[0] || user.email?.[0]}</AvatarFallback>
+                      <AvatarImage 
+                        src={profile?.avatar_url} 
+                        alt={profile?.username || user.email} 
+                      />
+                      <AvatarFallback>
+                        {profile?.full_name ? 
+                          profile.full_name.charAt(0) + (profile.full_name.split(' ')[1]?.charAt(0) || '') : 
+                          user.email?.[0]}
+                      </AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
@@ -166,7 +170,6 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile menu */}
       {isMenuOpen && <div className="md:hidden py-4 px-2 glass animate-fade-in">
           <nav className="flex flex-col gap-2">
             {navItems.map(item => <NavItem key={item.to} to={item.to} icon={item.icon} label={item.label} isActive={location.pathname === item.to} />)}
@@ -176,8 +179,15 @@ const Navbar = () => {
                 <>
                   <div className="flex items-center gap-3 px-4 py-2">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={profile?.avatar_url} alt={profile?.username || user.email} />
-                      <AvatarFallback>{profile?.username?.[0] || user.email?.[0]}</AvatarFallback>
+                      <AvatarImage 
+                        src={profile?.avatar_url} 
+                        alt={profile?.username || user.email} 
+                      />
+                      <AvatarFallback>
+                        {profile?.full_name ? 
+                          profile.full_name.charAt(0) + (profile.full_name.split(' ')[1]?.charAt(0) || '') : 
+                          user.email?.[0]}
+                      </AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
                       <span className="text-sm font-semibold">{profile?.full_name || 'Pengguna'}</span>

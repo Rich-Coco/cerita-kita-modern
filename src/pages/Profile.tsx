@@ -86,6 +86,21 @@ const Profile = () => {
       const fileName = `${user.id}-${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = `avatars/${fileName}`;
 
+      // Check if avatars bucket exists, create it if it doesn't
+      const { data: buckets } = await supabase.storage.listBuckets();
+      const avatarBucketExists = buckets?.some(bucket => bucket.name === 'avatars');
+      
+      if (!avatarBucketExists) {
+        const { error: createBucketError } = await supabase.storage.createBucket('avatars', {
+          public: true
+        });
+        
+        if (createBucketError) {
+          console.error('Error creating avatars bucket:', createBucketError);
+          throw createBucketError;
+        }
+      }
+
       const { error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(filePath, avatarFile);
@@ -173,7 +188,9 @@ const Profile = () => {
                 <div className="flex flex-col items-center -mt-12">
                   <Avatar className="h-24 w-24 border-4 border-background">
                     <AvatarImage src={userData.avatar} />
-                    <AvatarFallback>{userData.name.charAt(0)}{userData.name.split(' ')[1]?.charAt(0) || ''}</AvatarFallback>
+                    <AvatarFallback>
+                      {userData.name ? userData.name.charAt(0) + (userData.name.split(' ')[1]?.charAt(0) || '') : ''}
+                    </AvatarFallback>
                   </Avatar>
                   
                   <div className="mt-4 text-center">
