@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -13,27 +14,72 @@ import { User, Bookmark, BookOpen, Settings, Pencil, Save, Coins, Heart, Eye } f
 import StoryCard from '@/components/story/StoryCard';
 import { stories } from '@/data/stories';
 import MainLayout from '@/components/layout/MainLayout';
+import { useAuth } from '@/hooks/useAuth';
+import { format } from 'date-fns';
+
 const Profile = () => {
   const [profileTab, setProfileTab] = useState('stories');
   const [isEditing, setIsEditing] = useState(false);
+  const { user, profile, updateProfile } = useAuth();
   const [userData, setUserData] = useState({
-    name: 'Budi Pratama',
-    username: 'budipratama',
-    bio: 'Penulis cerita fiksi dan penggemar sastra. Suka menulis cerita tentang petualangan dan misteri.',
+    name: '',
+    username: '',
+    bio: '',
     email: '',
-    avatar: 'https://i.pravatar.cc/150?img=32',
-    coins: 120,
-    joined: 'November 2023'
+    avatar: '',
+    coins: 0,
+    joined: ''
   });
-  const handleProfileUpdate = (e: React.FormEvent) => {
-    e.preventDefault();
-    toast({
-      title: "Profil Diperbarui",
-      description: "Informasi profil anda telah berhasil diperbarui."
-    });
-    setIsEditing(false);
+
+  // Initialize user data from profile
+  useEffect(() => {
+    if (profile) {
+      setUserData({
+        name: profile.full_name || '',
+        username: profile.username || '',
+        bio: profile.bio || '',
+        email: user?.email || '',
+        avatar: profile.avatar_url || '',
+        coins: profile.coins || 0,
+        joined: formatDate(profile.created_at)
+      });
+    }
+  }, [profile, user]);
+
+  // Format date helper function
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    try {
+      return format(new Date(dateString), 'MMMM yyyy');
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return '';
+    }
   };
-  return <MainLayout>
+
+  const handleProfileUpdate = async (e) => {
+    e.preventDefault();
+    
+    try {
+      await updateProfile({
+        full_name: userData.name,
+        username: userData.username,
+        bio: userData.bio,
+      });
+      
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast({
+        title: "Update Gagal",
+        description: "Terjadi kesalahan saat memperbarui profil",
+        variant: "destructive"
+      });
+    }
+  };
+
+  return (
+    <MainLayout>
       <div className="py-8 md:py-12 max-w-7xl mx-auto px-4 md:px-6">
         <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-8">
           <div className="space-y-6">
@@ -44,18 +90,12 @@ const Profile = () => {
                 <div className="flex flex-col items-center -mt-12">
                   <Avatar className="h-24 w-24 border-4 border-background">
                     <AvatarImage src={userData.avatar} />
-                    <AvatarFallback>BP</AvatarFallback>
+                    <AvatarFallback>{userData.name.charAt(0)}{userData.name.split(' ')[1]?.charAt(0) || ''}</AvatarFallback>
                   </Avatar>
                   
                   <div className="mt-4 text-center">
                     <h2 className="text-xl font-bold">{userData.name}</h2>
                     <p className="text-muted-foreground">@{userData.username}</p>
-                    
-                    <div className="flex items-center justify-center gap-2 mt-2">
-                      
-                      
-                      
-                    </div>
                   </div>
                   
                   <div className="mt-4 w-full text-sm text-muted-foreground">
@@ -252,6 +292,8 @@ const Profile = () => {
           </div>
         </div>
       </div>
-    </MainLayout>;
+    </MainLayout>
+  );
 };
+
 export default Profile;
