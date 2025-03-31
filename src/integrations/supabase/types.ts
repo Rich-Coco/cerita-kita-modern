@@ -136,6 +136,53 @@ export type Database = {
           },
         ]
       }
+      transactions: {
+        Row: {
+          amount: number
+          coins: number
+          created_at: string
+          id: string
+          midtrans_order_id: string
+          midtrans_transaction_id: string | null
+          payment_type: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          coins: number
+          created_at?: string
+          id?: string
+          midtrans_order_id: string
+          midtrans_transaction_id?: string | null
+          payment_type?: string | null
+          status: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          coins?: number
+          created_at?: string
+          id?: string
+          midtrans_order_id?: string
+          midtrans_transaction_id?: string | null
+          payment_type?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_reading_progress: {
         Row: {
           created_at: string
