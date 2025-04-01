@@ -5,15 +5,7 @@ import { Coins } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
-
-interface Transaction {
-  id: string;
-  created_at: string;
-  amount: number;
-  coins: number;
-  status: string;
-  payment_type: string | null;
-}
+import { Transaction } from '@/types/payment';
 
 const TransactionHistory = () => {
   const { user } = useAuth();
@@ -27,6 +19,7 @@ const TransactionHistory = () => {
       try {
         setIsLoading(true);
         
+        // Use the PostgreSQL table name directly
         const { data, error } = await supabase
           .from('transactions')
           .select('*')
@@ -39,7 +32,7 @@ const TransactionHistory = () => {
           return;
         }
         
-        setTransactions(data || []);
+        setTransactions(data as Transaction[] || []);
       } catch (error) {
         console.error('Error in fetchTransactions:', error);
       } finally {

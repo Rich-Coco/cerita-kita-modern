@@ -1,2 +1,6 @@
 
 project_id = "ubinygiroepdswfpvvze"
+
+[functions.midtrans.secrets]
+MIDTRANS_SERVER_KEY = "SB-Mid-server-LZZAYTzdLgV503XvV1EHvBb-"
+MIDTRANS_CLIENT_KEY = "SB-Mid-client-H7e7sTzZXal3L1aA"
