@@ -82,7 +82,7 @@ const MidtransPayment = ({ packageData, onSuccess, onError }: MidtransPaymentPro
         console.error("Error creating payment:", error);
         toast({
           title: "Gagal membuat pembayaran",
-          description: "Terjadi kesalahan saat memproses pembayaran Anda",
+          description: "Terjadi kesalahan saat memproses pembayaran Anda. Silakan coba lagi.",
           variant: "destructive"
         });
         if (onError) onError(error.message);
@@ -93,13 +93,14 @@ const MidtransPayment = ({ packageData, onSuccess, onError }: MidtransPaymentPro
       console.log("Payment creation response:", data);
       
       if (!data || !data.token) {
+        const errorMsg = data?.error || "Invalid response from payment service";
         console.error("Invalid response from payment service:", data);
         toast({
           title: "Gagal membuat pembayaran",
-          description: "Respons dari layanan pembayaran tidak valid",
+          description: "Respons dari layanan pembayaran tidak valid. Silakan coba lagi.",
           variant: "destructive"
         });
-        if (onError) onError("Invalid payment response");
+        if (onError) onError(errorMsg);
         setIsLoading(false);
         return;
       }
@@ -111,7 +112,7 @@ const MidtransPayment = ({ packageData, onSuccess, onError }: MidtransPaymentPro
         console.error("Failed to load Midtrans script:", error);
         toast({
           title: "Gagal memuat skrip pembayaran",
-          description: "Terjadi kesalahan saat memuat skrip Midtrans",
+          description: "Terjadi kesalahan saat memuat skrip Midtrans. Silakan coba lagi.",
           variant: "destructive"
         });
         if (onError) onError("Failed to load payment script");
@@ -163,11 +164,10 @@ const MidtransPayment = ({ packageData, onSuccess, onError }: MidtransPaymentPro
       console.error("Payment error:", error);
       toast({
         title: "Gagal memproses pembayaran",
-        description: "Terjadi kesalahan saat memproses pembayaran Anda",
+        description: "Terjadi kesalahan saat memproses pembayaran Anda. Silakan coba lagi.",
         variant: "destructive"
       });
       if (onError) onError(error.message);
-    } finally {
       setIsLoading(false);
     }
   };

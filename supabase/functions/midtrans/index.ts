@@ -16,9 +16,12 @@ serve(async (req) => {
   }
 
   try {
-    // Access environment variables for Midtrans keys - these are set in config.toml
+    // Access environment variables for Midtrans keys
     const MIDTRANS_SERVER_KEY = Deno.env.get("MIDTRANS_SERVER_KEY");
     const MIDTRANS_CLIENT_KEY = Deno.env.get("MIDTRANS_CLIENT_KEY");
+    
+    console.log("Server key available:", !!MIDTRANS_SERVER_KEY);
+    console.log("Client key available:", !!MIDTRANS_CLIENT_KEY);
     
     if (!MIDTRANS_SERVER_KEY || !MIDTRANS_CLIENT_KEY) {
       console.error("Missing Midtrans API keys");
@@ -32,7 +35,19 @@ serve(async (req) => {
     const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") || "";
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const { action, payload } = await req.json();
+    // Parse the request body as JSON
+    let body;
+    try {
+      body = await req.json();
+    } catch (error) {
+      console.error("Failed to parse request body:", error);
+      return new Response(
+        JSON.stringify({ error: "Invalid JSON in request body" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
+      );
+    }
+
+    const { action, payload } = body;
     console.log(`Processing ${action} request with payload:`, JSON.stringify(payload));
 
     // Create payment session for Midtrans
@@ -79,39 +94,71 @@ serve(async (req) => {
       
       console.log(`Calling Midtrans API for order: ${orderId}`);
       
-      const midtransResponse = await fetch(midtransBaseUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-          "Authorization": `Basic ${authToken}`
-        },
-        body: JSON.stringify({
-          transaction_details: {
+      try {
+        const midtransResponse = await fetch(midtransBaseUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Authorization": `Basic ${authToken}`
+          },
+          body: JSON.stringify({
+            transaction_details: {
+              order_id: orderId,
+              gross_amount: amount
+            },
+            credit_card: {
+              secure: true
+            },
+            customer_details: {
+              first_name: name,
+              email: email
+            },
+            item_details: [{
+              id: packageId,
+              price: amount,
+              quantity: 1,
+              name: `${coins} Koin Hunt`
+            }]
+          })
+        });
+        
+        if (!midtransResponse.ok) {
+          const errorText = await midtransResponse.text();
+          console.error("Midtrans API error response:", errorText);
+          console.error("Response status:", midtransResponse.status);
+          
+          // Update transaction status to failed
+          await supabase
+            .from("transactions")
+            .update({ status: "failed" })
+            .eq("id", transaction.id);
+          
+          return new Response(
+            JSON.stringify({ 
+              error: "Failed to create payment token", 
+              midtransError: errorText,
+              status: midtransResponse.status 
+            }),
+            { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
+          );
+        }
+        
+        const midtransData = await midtransResponse.json();
+        console.log(`Successfully created Midtrans token for order: ${orderId}`);
+        
+        return new Response(
+          JSON.stringify({ 
+            token: midtransData.token,
+            redirect_url: midtransData.redirect_url,
+            transaction_id: transaction.id,
             order_id: orderId,
-            gross_amount: amount
-          },
-          credit_card: {
-            secure: true
-          },
-          customer_details: {
-            first_name: name,
-            email: email
-          },
-          item_details: [{
-            id: packageId,
-            price: amount,
-            quantity: 1,
-            name: `${coins} Koin Hunt`
-          }]
-        })
-      });
-      
-      const midtransData = await midtransResponse.json();
-      
-      if (!midtransResponse.ok) {
-        console.error("Midtrans API error:", midtransData);
-        console.error("Response status:", midtransResponse.status);
+            client_key: MIDTRANS_CLIENT_KEY
+          }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      } catch (error) {
+        console.error("Error calling Midtrans API:", error);
         
         // Update transaction status to failed
         await supabase
@@ -120,27 +167,10 @@ serve(async (req) => {
           .eq("id", transaction.id);
         
         return new Response(
-          JSON.stringify({ 
-            error: "Failed to create payment token", 
-            midtransError: midtransData,
-            status: midtransResponse.status 
-          }),
+          JSON.stringify({ error: "Failed to connect to Midtrans API", details: error.message }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
         );
       }
-      
-      console.log(`Successfully created Midtrans token for order: ${orderId}`);
-      
-      return new Response(
-        JSON.stringify({ 
-          token: midtransData.token,
-          redirect_url: midtransData.redirect_url,
-          transaction_id: transaction.id,
-          order_id: orderId,
-          client_key: MIDTRANS_CLIENT_KEY
-        }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
     }
     
     // Handle Midtrans webhook notifications
