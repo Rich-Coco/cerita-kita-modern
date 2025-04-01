@@ -19,9 +19,11 @@ serve(async (req) => {
     // Access environment variables for Midtrans keys
     const MIDTRANS_SERVER_KEY = Deno.env.get("MIDTRANS_SERVER_KEY");
     const MIDTRANS_CLIENT_KEY = Deno.env.get("MIDTRANS_CLIENT_KEY");
+    const MIDTRANS_MERCHANT_ID = Deno.env.get("MIDTRANS_MERCHANT_ID");
     
     console.log("Server key available:", !!MIDTRANS_SERVER_KEY);
     console.log("Client key available:", !!MIDTRANS_CLIENT_KEY);
+    console.log("Merchant ID available:", !!MIDTRANS_MERCHANT_ID);
     
     if (!MIDTRANS_SERVER_KEY || !MIDTRANS_CLIENT_KEY) {
       console.error("Missing Midtrans API keys");
@@ -94,6 +96,28 @@ serve(async (req) => {
       
       console.log(`Calling Midtrans API for order: ${orderId}`);
       
+      const midtransPayload = {
+        transaction_details: {
+          order_id: orderId,
+          gross_amount: amount
+        },
+        credit_card: {
+          secure: true
+        },
+        customer_details: {
+          first_name: name,
+          email: email
+        },
+        item_details: [{
+          id: packageId,
+          price: amount,
+          quantity: 1,
+          name: `${coins} Koin Hunt`
+        }]
+      };
+      
+      console.log("Midtrans request payload:", JSON.stringify(midtransPayload));
+      
       try {
         const midtransResponse = await fetch(midtransBaseUrl, {
           method: "POST",
@@ -102,31 +126,14 @@ serve(async (req) => {
             "Accept": "application/json",
             "Authorization": `Basic ${authToken}`
           },
-          body: JSON.stringify({
-            transaction_details: {
-              order_id: orderId,
-              gross_amount: amount
-            },
-            credit_card: {
-              secure: true
-            },
-            customer_details: {
-              first_name: name,
-              email: email
-            },
-            item_details: [{
-              id: packageId,
-              price: amount,
-              quantity: 1,
-              name: `${coins} Koin Hunt`
-            }]
-          })
+          body: JSON.stringify(midtransPayload)
         });
         
+        const responseText = await midtransResponse.text();
+        console.log("Midtrans raw response:", responseText);
+        
         if (!midtransResponse.ok) {
-          const errorText = await midtransResponse.text();
-          console.error("Midtrans API error response:", errorText);
-          console.error("Response status:", midtransResponse.status);
+          console.error("Midtrans API error response status:", midtransResponse.status);
           
           // Update transaction status to failed
           await supabase
@@ -137,15 +144,28 @@ serve(async (req) => {
           return new Response(
             JSON.stringify({ 
               error: "Failed to create payment token", 
-              midtransError: errorText,
-              status: midtransResponse.status 
+              status: midtransResponse.status,
+              details: responseText
             }),
             { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
           );
         }
         
-        const midtransData = await midtransResponse.json();
-        console.log(`Successfully created Midtrans token for order: ${orderId}`);
+        let midtransData;
+        try {
+          midtransData = JSON.parse(responseText);
+        } catch (e) {
+          console.error("Failed to parse Midtrans response:", e);
+          return new Response(
+            JSON.stringify({ 
+              error: "Invalid response from Midtrans", 
+              details: responseText
+            }),
+            { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
+          );
+        }
+        
+        console.log(`Successfully created Midtrans token for order: ${orderId}`, midtransData);
         
         return new Response(
           JSON.stringify({ 
@@ -294,13 +314,89 @@ serve(async (req) => {
         );
       }
       
+      // Manual check with Midtrans if status is still pending
+      if (transaction.status === "pending" && transaction.midtrans_order_id) {
+        const midtransStatusUrl = `https://api.sandbox.midtrans.com/v2/${transaction.midtrans_order_id}/status`;
+        const authToken = btoa(`${MIDTRANS_SERVER_KEY}:`);
+        
+        try {
+          const response = await fetch(midtransStatusUrl, {
+            method: "GET",
+            headers: {
+              "Accept": "application/json",
+              "Content-Type": "application/json",
+              "Authorization": `Basic ${authToken}`
+            }
+          });
+          
+          if (response.ok) {
+            const midtransStatus = await response.json();
+            console.log("Midtrans status check response:", midtransStatus);
+            
+            // Update transaction status based on Midtrans response
+            let newStatus = transaction.status;
+            
+            if (midtransStatus.transaction_status === "capture" || 
+                midtransStatus.transaction_status === "settlement") {
+              if (midtransStatus.fraud_status === "accept" || !midtransStatus.fraud_status) {
+                newStatus = "success";
+              }
+            } else if (midtransStatus.transaction_status === "deny" || 
+                      midtransStatus.transaction_status === "cancel" || 
+                      midtransStatus.transaction_status === "expire") {
+              newStatus = "failed";
+            }
+            
+            // Update transaction if status changed
+            if (newStatus !== transaction.status) {
+              const { error: updateError } = await supabase
+                .from("transactions")
+                .update({
+                  status: newStatus,
+                  payment_type: midtransStatus.payment_type,
+                  midtrans_transaction_id: midtransStatus.transaction_id
+                })
+                .eq("id", transaction.id);
+              
+              if (updateError) {
+                console.error("Error updating transaction status:", updateError);
+              } else {
+                // If payment successful, update user coins
+                if (newStatus === "success") {
+                  const { data: profile, error: profileError } = await supabase
+                    .from("profiles")
+                    .select("coins")
+                    .eq("id", transaction.user_id)
+                    .single();
+                  
+                  if (!profileError && profile) {
+                    const newCoins = (profile.coins || 0) + transaction.coins;
+                    
+                    await supabase
+                      .from("profiles")
+                      .update({ coins: newCoins })
+                      .eq("id", transaction.user_id);
+                  }
+                }
+                
+                // Return updated status
+                transaction.status = newStatus;
+              }
+            }
+          }
+        } catch (error) {
+          console.error("Error checking Midtrans status:", error);
+        }
+      }
+      
       return new Response(
         JSON.stringify({ 
           status: transaction.status,
           order_id: transaction.midtrans_order_id,
           amount: transaction.amount,
           coins: transaction.coins,
-          payment_type: transaction.payment_type
+          payment_type: transaction.payment_type,
+          created_at: transaction.created_at
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );

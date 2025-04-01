@@ -74,7 +74,7 @@ const MidtransPayment = ({ packageData, onSuccess, onError }: MidtransPaymentPro
       const { data, error } = await supabase.functions.invoke("midtrans", {
         body: {
           action: "create_payment",
-          payload: payload
+          payload
         }
       });
       
@@ -138,7 +138,8 @@ const MidtransPayment = ({ packageData, onSuccess, onError }: MidtransPaymentPro
             });
             checkTransactionStatus(data.transaction_id);
           },
-          onError: () => {
+          onError: (error: any) => {
+            console.error("Midtrans payment error:", error);
             toast({
               title: "Pembayaran gagal",
               description: "Terjadi kesalahan saat memproses pembayaran Anda",
@@ -158,7 +159,13 @@ const MidtransPayment = ({ packageData, onSuccess, onError }: MidtransPaymentPro
         });
       } else {
         // Fallback for when Snap isn't available
-        window.location.href = data.redirect_url;
+        console.error("Midtrans Snap not loaded properly");
+        toast({
+          title: "Gagal memuat pembayaran",
+          description: "Tidak dapat memuat sistem pembayaran. Silakan coba lagi.",
+          variant: "destructive"
+        });
+        setIsLoading(false);
       }
     } catch (error: any) {
       console.error("Payment error:", error);
@@ -191,6 +198,8 @@ const MidtransPayment = ({ packageData, onSuccess, onError }: MidtransPaymentPro
           console.error("Error checking transaction status:", error);
           continue;
         }
+        
+        console.log("Transaction status check response:", data);
         
         if (data.status === "success") {
           toast({
