@@ -10,20 +10,21 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PackageType } from '@/types/payment';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
+
 const coinPackages: PackageType[] = [{
   id: 'basic',
   name: 'Paket Dasar',
-  coins: 50,
-  price: 'Rp 25.000',
-  priceValue: 25000,
+  coins: 10,
+  price: 'Rp 10.000',
+  priceValue: 10000,
   features: ['Akses ke 1 chapter premium', 'Berlaku selamanya', 'Tidak ada batasan waktu'],
   popular: false
 }, {
   id: 'premium',
   name: 'Paket Premium',
-  coins: 150,
-  price: 'Rp 65.000',
-  priceValue: 65000,
+  coins: 30,
+  price: 'Rp 30.000',
+  priceValue: 30000,
   features: ['Akses ke 5 chapter premium', 'Diskon 15% dari harga per koin', 'Hadiah bonus badge profil', 'Berlaku selamanya'],
   popular: true
 }, {
@@ -35,6 +36,7 @@ const coinPackages: PackageType[] = [{
   features: ['Akses ke 20 chapter premium', 'Diskon 30% dari harga per koin', 'Hadiah bonus badge profil eksklusif', 'Fitur highlight komentar', 'Berlaku selamanya'],
   popular: false
 }];
+
 const CoinsPage = () => {
   const {
     user,
@@ -175,4 +177,5 @@ const CoinsPage = () => {
       </div>
     </MainLayout>;
 };
+
 export default CoinsPage;
