@@ -7,6 +7,7 @@ export type PackageType = {
   priceValue: number;
   features: string[];
   popular: boolean;
+  paymentLink?: string;
 };
 
 export type TransactionStatus = 'pending' | 'success' | 'failed';

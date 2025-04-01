@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,7 +18,8 @@ const coinPackages: PackageType[] = [{
   price: 'Rp 10.000',
   priceValue: 10000,
   features: ['Akses ke 1 chapter premium', 'Berlaku selamanya', 'Tidak ada batasan waktu'],
-  popular: false
+  popular: false,
+  paymentLink: 'https://app.sandbox.midtrans.com/payment-links/1743487491402'
 }, {
   id: 'premium',
   name: 'Paket Premium',
@@ -45,13 +45,20 @@ const CoinsPage = () => {
   } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('packages');
+
   const handlePaymentSuccess = () => {
     // Refresh profile to get updated coin balance
     window.location.reload();
   };
+
   const handlePaymentError = (error: string) => {
     console.error('Payment error:', error);
   };
+
+  const handleDirectPaymentRedirect = (paymentLink: string) => {
+    window.location.href = paymentLink;
+  };
+
   return <MainLayout>
       <div className="py-8 md:py-16 max-w-7xl mx-auto px-4 md:px-6">
         <div className="max-w-3xl mx-auto text-center mb-8">
@@ -118,12 +125,21 @@ const CoinsPage = () => {
                         {Math.round(pkg.priceValue / pkg.coins * 100) / 100} per koin
                       </div>
                     </div>
-                    
-                    
                   </CardContent>
                   
                   <CardFooter>
-                    <MidtransPayment packageData={pkg} onSuccess={handlePaymentSuccess} onError={handlePaymentError} />
+                    {pkg.id === 'basic' && pkg.paymentLink ? (
+                      <Button 
+                        onClick={() => handleDirectPaymentRedirect(pkg.paymentLink!)}
+                        className="w-full"
+                        variant="outline"
+                      >
+                        <CreditCard size={16} className="mr-2" />
+                        Beli Sekarang
+                      </Button>
+                    ) : (
+                      <MidtransPayment packageData={pkg} onSuccess={handlePaymentSuccess} onError={handlePaymentError} />
+                    )}
                   </CardFooter>
                 </Card>)}
             </div>
