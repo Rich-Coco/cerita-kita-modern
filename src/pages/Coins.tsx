@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,7 +20,7 @@ const coinPackages: PackageType[] = [{
   priceValue: 10000,
   features: ['Akses ke 1 chapter premium', 'Berlaku selamanya', 'Tidak ada batasan waktu'],
   popular: false,
-  paymentLink: 'https://app.sandbox.midtrans.com/payment-links/1743487491402'
+  paymentLink: 'https://app.sandbox.midtrans.com/payment-links/1743496234905'
 }, {
   id: 'premium',
   name: 'Paket Premium',
