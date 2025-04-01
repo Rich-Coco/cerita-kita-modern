@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PackageType } from '@/types/payment';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 
 const coinPackages: PackageType[] = [{
   id: 'basic',
@@ -47,8 +47,65 @@ const CoinsPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('packages');
 
+  useEffect(() => {
+    const handleDirectPaymentCallback = async () => {
+      if (!user) return;
+      
+      const url = new URL(window.location.href);
+      const orderId = url.searchParams.get('order_id');
+      const status = url.searchParams.get('transaction_status');
+      const source = url.searchParams.get('source');
+      
+      if (orderId && status === 'settlement' && source === 'midtrans') {
+        try {
+          console.log('Processing direct payment callback:', orderId);
+          
+          const { data, error } = await supabase.functions.invoke("midtrans", {
+            body: {
+              action: "direct_payment_callback",
+              payload: {
+                order_id: orderId,
+                user_id: user.id
+              }
+            }
+          });
+          
+          if (error) {
+            console.error('Error processing direct payment:', error);
+            toast({
+              title: 'Pembayaran gagal diproses',
+              description: 'Terjadi kesalahan saat memproses pembayaran Anda',
+              variant: 'destructive'
+            });
+            return;
+          }
+          
+          if (data.success) {
+            toast({
+              title: 'Pembayaran berhasil!',
+              description: `${data.coins_added || 10} koin telah ditambahkan ke akun Anda`,
+            });
+            
+            window.history.replaceState({}, document.title, window.location.pathname);
+            window.location.reload();
+          } else if (data.status === 'exists') {
+            toast({
+              title: 'Pembayaran sudah diproses',
+              description: 'Pembayaran ini sudah pernah diproses sebelumnya',
+            });
+            
+            window.history.replaceState({}, document.title, window.location.pathname);
+          }
+        } catch (error) {
+          console.error('Error handling direct payment callback:', error);
+        }
+      }
+    };
+    
+    handleDirectPaymentCallback();
+  }, [user]);
+
   const handlePaymentSuccess = () => {
-    // Refresh profile to get updated coin balance
     window.location.reload();
   };
 
@@ -57,7 +114,14 @@ const CoinsPage = () => {
   };
 
   const handleDirectPaymentRedirect = (paymentLink: string) => {
-    window.location.href = paymentLink;
+    const urlWithCallback = new URL(paymentLink);
+    if (user) {
+      const callbackUrl = new URL(window.location.href);
+      callbackUrl.searchParams.set('source', 'midtrans');
+      urlWithCallback.searchParams.append('finish_redirect_url', callbackUrl.toString());
+    }
+    
+    window.location.href = urlWithCallback.toString();
   };
 
   return <MainLayout>

@@ -402,6 +402,107 @@ serve(async (req) => {
       );
     }
 
+    // New handler for direct payment link callbacks
+    if (action === "direct_payment_callback") {
+      const { order_id, user_id } = payload;
+      
+      if (!order_id || !user_id) {
+        return new Response(
+          JSON.stringify({ error: "Missing order_id or user_id" }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
+        );
+      }
+      
+      console.log(`Processing direct payment callback for order: ${order_id} and user: ${user_id}`);
+      
+      // Check if transaction already exists
+      const { data: existingTransaction, error: checkError } = await supabase
+        .from("transactions")
+        .select("*")
+        .eq("midtrans_order_id", order_id)
+        .single();
+      
+      if (checkError && checkError.code !== "PGRST116") { // PGRST116 is "no rows returned" error
+        console.error("Error checking for existing transaction:", checkError);
+        return new Response(
+          JSON.stringify({ error: "Failed to check for existing transaction" }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
+        );
+      }
+      
+      if (existingTransaction) {
+        console.log("Transaction already exists, skipping creation");
+        return new Response(
+          JSON.stringify({ success: true, status: "exists", transaction_id: existingTransaction.id }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      
+      // Create transaction record in database for the direct payment
+      const { data: transaction, error: transactionError } = await supabase
+        .from("transactions")
+        .insert({
+          user_id: user_id,
+          amount: 10000, // Amount for Paket Dasar
+          coins: 10,     // Coins for Paket Dasar
+          status: "success", // Direct payment links are always successful when callback is triggered
+          midtrans_order_id: order_id,
+          payment_type: "direct_link"
+        })
+        .select()
+        .single();
+      
+      if (transactionError) {
+        console.error("Error creating transaction:", transactionError);
+        return new Response(
+          JSON.stringify({ error: "Failed to create transaction", details: transactionError }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
+        );
+      }
+      
+      // Update user's coin balance
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("coins")
+        .eq("id", user_id)
+        .single();
+      
+      if (profileError) {
+        console.error("Error finding user profile:", profileError);
+        return new Response(
+          JSON.stringify({ error: "User profile not found", details: profileError }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 404 }
+        );
+      }
+      
+      const newCoins = (profile.coins || 0) + 10; // Add 10 coins for Paket Dasar
+      
+      const { error: coinUpdateError } = await supabase
+        .from("profiles")
+        .update({ coins: newCoins })
+        .eq("id", user_id);
+      
+      if (coinUpdateError) {
+        console.error("Error updating user's coins:", coinUpdateError);
+        return new Response(
+          JSON.stringify({ error: "Failed to update user's coins", details: coinUpdateError }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
+        );
+      }
+      
+      console.log(`Successfully added 10 coins to user ${user_id}. New balance: ${newCoins}`);
+      
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          transaction_id: transaction.id,
+          coins_added: 10,
+          new_balance: newCoins
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     return new Response(
       JSON.stringify({ error: "Invalid action" }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
