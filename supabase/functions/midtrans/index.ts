@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
 
@@ -21,9 +20,9 @@ serve(async (req) => {
     const MIDTRANS_CLIENT_KEY = Deno.env.get("MIDTRANS_CLIENT_KEY") || "";
     const MIDTRANS_MERCHANT_ID = Deno.env.get("MIDTRANS_MERCHANT_ID") || "";
     
-    console.log("Midtrans Server Key length:", MIDTRANS_SERVER_KEY.length);
-    console.log("Midtrans Client Key length:", MIDTRANS_CLIENT_KEY.length);
-    console.log("Midtrans Merchant ID length:", MIDTRANS_MERCHANT_ID.length);
+    console.log("Midtrans Server Key available:", MIDTRANS_SERVER_KEY ? "Yes" : "No");
+    console.log("Midtrans Client Key available:", MIDTRANS_CLIENT_KEY ? "Yes" : "No");
+    console.log("Midtrans Merchant ID available:", MIDTRANS_MERCHANT_ID ? "Yes" : "No");
     
     if (!MIDTRANS_SERVER_KEY || !MIDTRANS_CLIENT_KEY || !MIDTRANS_MERCHANT_ID) {
       console.error("Missing Midtrans API keys");
@@ -95,6 +94,7 @@ serve(async (req) => {
       const authToken = btoa(`${MIDTRANS_SERVER_KEY}:`);
       
       console.log(`Calling Midtrans API for order: ${orderId}`);
+      console.log(`Using auth token created with server key: ${MIDTRANS_SERVER_KEY.substring(0, 10)}...`);
       
       const midtransPayload = {
         transaction_details: {

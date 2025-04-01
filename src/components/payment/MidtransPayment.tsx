@@ -97,7 +97,7 @@ const MidtransPayment = ({ packageData, onSuccess, onError }: MidtransPaymentPro
         console.error("Invalid response from payment service:", data);
         toast({
           title: "Gagal membuat pembayaran",
-          description: "Respons dari layanan pembayaran tidak valid. Silakan coba lagi.",
+          description: `${data?.error || "Respons dari layanan pembayaran tidak valid"}. Silakan coba lagi.`,
           variant: "destructive"
         });
         if (onError) onError(errorMsg);
