@@ -68,6 +68,8 @@ const MidtransPayment = ({ packageData, onSuccess, onError }: MidtransPaymentPro
         email: user.email
       };
       
+      console.log("Sending payment request with payload:", payload);
+      
       // Call Supabase Edge Function to create payment
       const { data, error } = await supabase.functions.invoke("midtrans", {
         body: {
@@ -84,17 +86,49 @@ const MidtransPayment = ({ packageData, onSuccess, onError }: MidtransPaymentPro
           variant: "destructive"
         });
         if (onError) onError(error.message);
+        setIsLoading(false);
+        return;
+      }
+      
+      console.log("Payment creation response:", data);
+      
+      if (!data || !data.token) {
+        console.error("Invalid response from payment service:", data);
+        toast({
+          title: "Gagal membuat pembayaran",
+          description: "Respons dari layanan pembayaran tidak valid",
+          variant: "destructive"
+        });
+        if (onError) onError("Invalid payment response");
+        setIsLoading(false);
         return;
       }
       
       // Load Midtrans script
-      await loadMidtransScript(data.client_key);
+      try {
+        await loadMidtransScript(data.client_key);
+      } catch (error) {
+        console.error("Failed to load Midtrans script:", error);
+        toast({
+          title: "Gagal memuat skrip pembayaran",
+          description: "Terjadi kesalahan saat memuat skrip Midtrans",
+          variant: "destructive"
+        });
+        if (onError) onError("Failed to load payment script");
+        setIsLoading(false);
+        return;
+      }
       
       // Open Midtrans Snap payment page
       if (window.snap) {
         window.snap.pay(data.token, {
           onSuccess: () => {
+            toast({
+              title: "Pembayaran berhasil",
+              description: `${packageData.coins} koin telah ditambahkan ke akun Anda`
+            });
             checkTransactionStatus(data.transaction_id);
+            if (onSuccess) onSuccess();
           },
           onPending: () => {
             toast({
@@ -110,6 +144,7 @@ const MidtransPayment = ({ packageData, onSuccess, onError }: MidtransPaymentPro
               variant: "destructive"
             });
             if (onError) onError("Payment failed");
+            setIsLoading(false);
           },
           onClose: () => {
             toast({
@@ -117,13 +152,14 @@ const MidtransPayment = ({ packageData, onSuccess, onError }: MidtransPaymentPro
               description: "Anda telah menutup halaman pembayaran"
             });
             checkTransactionStatus(data.transaction_id);
+            setIsLoading(false);
           }
         });
       } else {
         // Fallback for when Snap isn't available
         window.location.href = data.redirect_url;
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Payment error:", error);
       toast({
         title: "Gagal memproses pembayaran",
@@ -162,6 +198,7 @@ const MidtransPayment = ({ packageData, onSuccess, onError }: MidtransPaymentPro
             description: `${packageData.coins} koin telah ditambahkan ke akun Anda`,
           });
           if (onSuccess) onSuccess();
+          setIsLoading(false);
           return;
         } else if (data.status === "failed") {
           toast({
@@ -170,6 +207,7 @@ const MidtransPayment = ({ packageData, onSuccess, onError }: MidtransPaymentPro
             variant: "destructive"
           });
           if (onError) onError("Payment failed");
+          setIsLoading(false);
           return;
         }
       }
@@ -179,8 +217,10 @@ const MidtransPayment = ({ packageData, onSuccess, onError }: MidtransPaymentPro
         title: "Status pembayaran",
         description: "Pembayaran masih diproses. Koin akan ditambahkan otomatis setelah pembayaran selesai."
       });
+      setIsLoading(false);
     } catch (error) {
       console.error("Error checking transaction status:", error);
+      setIsLoading(false);
     }
   };
   

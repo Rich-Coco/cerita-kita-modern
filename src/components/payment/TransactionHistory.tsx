@@ -19,20 +19,20 @@ const TransactionHistory = () => {
       try {
         setIsLoading(true);
         
-        // Use the PostgreSQL table name directly
-        const { data, error } = await supabase
+        // Use the PostgreSQL table name directly with type assertion to bypass TypeScript check
+        const { data, error } = await (supabase
           .from('transactions')
           .select('*')
           .eq('user_id', user.id)
           .order('created_at', { ascending: false })
-          .limit(10);
+          .limit(10) as any);
         
         if (error) {
           console.error('Error fetching transactions:', error);
           return;
         }
         
-        setTransactions(data as Transaction[] || []);
+        setTransactions(data || []);
       } catch (error) {
         console.error('Error in fetchTransactions:', error);
       } finally {

@@ -16,11 +16,16 @@ serve(async (req) => {
   }
 
   try {
+    // Access environment variables for Midtrans keys - these are set in config.toml
     const MIDTRANS_SERVER_KEY = Deno.env.get("MIDTRANS_SERVER_KEY");
     const MIDTRANS_CLIENT_KEY = Deno.env.get("MIDTRANS_CLIENT_KEY");
     
     if (!MIDTRANS_SERVER_KEY || !MIDTRANS_CLIENT_KEY) {
-      throw new Error("Missing Midtrans API keys");
+      console.error("Missing Midtrans API keys");
+      return new Response(
+        JSON.stringify({ error: "Missing Midtrans API keys" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
+      );
     }
     
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
@@ -28,6 +33,7 @@ serve(async (req) => {
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const { action, payload } = await req.json();
+    console.log(`Processing ${action} request with payload:`, JSON.stringify(payload));
 
     // Create payment session for Midtrans
     if (action === "create_payment") {
@@ -43,6 +49,8 @@ serve(async (req) => {
       // Generate unique order ID with timestamp
       const timestamp = new Date().getTime();
       const orderId = `HUNT-${packageId}-${timestamp}`;
+      
+      console.log(`Creating transaction record for order: ${orderId}`);
       
       // Create transaction record in database
       const { data: transaction, error: transactionError } = await supabase
@@ -60,7 +68,7 @@ serve(async (req) => {
       if (transactionError) {
         console.error("Error creating transaction:", transactionError);
         return new Response(
-          JSON.stringify({ error: "Failed to create transaction" }),
+          JSON.stringify({ error: "Failed to create transaction", details: transactionError }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
         );
       }
@@ -68,6 +76,8 @@ serve(async (req) => {
       // Create Midtrans Snap token
       const midtransBaseUrl = "https://app.sandbox.midtrans.com/snap/v1/transactions"; // Use "https://app.midtrans.com/snap/v1/transactions" for production
       const authToken = btoa(`${MIDTRANS_SERVER_KEY}:`);
+      
+      console.log(`Calling Midtrans API for order: ${orderId}`);
       
       const midtransResponse = await fetch(midtransBaseUrl, {
         method: "POST",
@@ -101,6 +111,7 @@ serve(async (req) => {
       
       if (!midtransResponse.ok) {
         console.error("Midtrans API error:", midtransData);
+        console.error("Response status:", midtransResponse.status);
         
         // Update transaction status to failed
         await supabase
@@ -109,10 +120,16 @@ serve(async (req) => {
           .eq("id", transaction.id);
         
         return new Response(
-          JSON.stringify({ error: "Failed to create payment token" }),
+          JSON.stringify({ 
+            error: "Failed to create payment token", 
+            midtransError: midtransData,
+            status: midtransResponse.status 
+          }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
         );
       }
+      
+      console.log(`Successfully created Midtrans token for order: ${orderId}`);
       
       return new Response(
         JSON.stringify({ 
