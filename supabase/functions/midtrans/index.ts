@@ -17,18 +17,18 @@ serve(async (req) => {
 
   try {
     // Access environment variables for Midtrans keys
-    const MIDTRANS_SERVER_KEY = Deno.env.get("MIDTRANS_SERVER_KEY");
-    const MIDTRANS_CLIENT_KEY = Deno.env.get("MIDTRANS_CLIENT_KEY");
-    const MIDTRANS_MERCHANT_ID = Deno.env.get("MIDTRANS_MERCHANT_ID");
+    const MIDTRANS_SERVER_KEY = Deno.env.get("MIDTRANS_SERVER_KEY") || "";
+    const MIDTRANS_CLIENT_KEY = Deno.env.get("MIDTRANS_CLIENT_KEY") || "";
+    const MIDTRANS_MERCHANT_ID = Deno.env.get("MIDTRANS_MERCHANT_ID") || "";
     
-    console.log("Server key available:", !!MIDTRANS_SERVER_KEY);
-    console.log("Client key available:", !!MIDTRANS_CLIENT_KEY);
-    console.log("Merchant ID available:", !!MIDTRANS_MERCHANT_ID);
+    console.log("Midtrans Server Key length:", MIDTRANS_SERVER_KEY.length);
+    console.log("Midtrans Client Key length:", MIDTRANS_CLIENT_KEY.length);
+    console.log("Midtrans Merchant ID length:", MIDTRANS_MERCHANT_ID.length);
     
-    if (!MIDTRANS_SERVER_KEY || !MIDTRANS_CLIENT_KEY) {
+    if (!MIDTRANS_SERVER_KEY || !MIDTRANS_CLIENT_KEY || !MIDTRANS_MERCHANT_ID) {
       console.error("Missing Midtrans API keys");
       return new Response(
-        JSON.stringify({ error: "Missing Midtrans API keys" }),
+        JSON.stringify({ error: "Missing Midtrans API keys, please check your Supabase secrets configuration" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
       );
     }
