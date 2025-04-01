@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -30,9 +31,9 @@ const coinPackages: PackageType[] = [{
 }, {
   id: 'ultimate',
   name: 'Paket Ultimate',
-  coins: 500,
-  price: 'Rp 175.000',
-  priceValue: 175000,
+  coins: 50,
+  price: 'Rp 50.000',
+  priceValue: 50000,
   features: ['Akses ke 20 chapter premium', 'Diskon 30% dari harga per koin', 'Hadiah bonus badge profil eksklusif', 'Fitur highlight komentar', 'Berlaku selamanya'],
   popular: false
 }];
