@@ -70,6 +70,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const fetchProfile = async (userId: string) => {
     try {
+      console.log('Fetching profile for user:', userId);
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -207,7 +208,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: "Profil Anda berhasil diperbarui"
       });
       
-      // Refresh the profile
+      // Refresh the profile immediately after update
       await fetchProfile(user.id);
     } catch (error: any) {
       console.error('Error updating profile:', error);

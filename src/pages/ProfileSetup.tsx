@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -11,7 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "@/hooks/use-toast";
 import { User, Upload, Loader2 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
+import { uploadAvatar } from '@/utils/storage';
 
 const ProfileSetup = () => {
   const navigate = useNavigate();
@@ -62,42 +61,6 @@ const ProfileSetup = () => {
     }));
   };
 
-  const uploadAvatar = async (): Promise<string | null> => {
-    if (!avatarFile || !user) return null;
-
-    try {
-      const fileExt = avatarFile.name.split('.').pop();
-      const fileName = `${user.id}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-      const filePath = `avatars/${fileName}`;
-
-      // Upload the file to the avatars bucket with contentType
-      const { error: uploadError, data } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, avatarFile, {
-          upsert: true,
-          contentType: avatarFile.type
-        });
-
-      if (uploadError) {
-        console.error('Error uploading avatar:', uploadError);
-        throw uploadError;
-      }
-
-      // Get the public URL
-      const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
-      console.log('Uploaded avatar URL:', urlData.publicUrl);
-      return urlData.publicUrl;
-    } catch (error) {
-      console.error('Error uploading avatar:', error);
-      toast({
-        title: "Error uploading avatar",
-        description: "Please try again later",
-        variant: "destructive"
-      });
-      return null;
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
@@ -119,19 +82,31 @@ const ProfileSetup = () => {
       // Upload avatar if changed
       let avatarUrl = profileData.avatar_url;
       if (avatarFile) {
-        const newAvatarUrl = await uploadAvatar();
+        console.log('Uploading new avatar...');
+        const newAvatarUrl = await uploadAvatar(avatarFile, user.id);
         if (newAvatarUrl) {
+          console.log('New avatar URL:', newAvatarUrl);
           avatarUrl = newAvatarUrl;
+        } else {
+          console.error('Failed to upload avatar');
+          toast({
+            title: "Avatar upload failed",
+            description: "Could not upload avatar, but continuing with other profile updates",
+            variant: "destructive"
+          });
         }
       }
 
       // Update profile
-      await updateProfile({
+      const updatedProfile = {
         username: profileData.username,
         full_name: profileData.full_name,
         bio: profileData.bio,
         avatar_url: avatarUrl,
-      });
+      };
+      
+      console.log('Updating profile with:', updatedProfile);
+      await updateProfile(updatedProfile);
 
       // Force refresh avatar
       setAvatarKey(Date.now());

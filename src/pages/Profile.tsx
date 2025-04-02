@@ -9,13 +9,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/hooks/use-toast';
-import { User, Bookmark, BookOpen, Settings, Pencil, Save, Coins, Heart, Eye, Upload, Loader2, Wallet } from 'lucide-react';
-import StoryCard from '@/components/story/StoryCard';
-import { stories } from '@/data/stories';
+import { User, Bookmark, BookOpen, Settings, Pencil, Save, Coins, Upload, Loader2, Wallet } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
 import { useAuth } from '@/hooks/useAuth';
 import { format } from 'date-fns';
-import { supabase } from '@/integrations/supabase/client';
+import { uploadAvatar } from '@/utils/storage';
 import { Coins as CoinsDisplay } from '@/components/ui/coins';
 
 const Profile = () => {
@@ -39,6 +37,7 @@ const Profile = () => {
 
   useEffect(() => {
     if (profile) {
+      console.log('Setting user data from profile:', profile);
       setUserData({
         name: profile.full_name || '',
         username: profile.username || '',
@@ -65,6 +64,7 @@ const Profile = () => {
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      console.log('Avatar file selected:', file.name, file.type);
       setAvatarFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -74,67 +74,49 @@ const Profile = () => {
     }
   };
 
-  const uploadAvatar = async (): Promise<string | null> => {
-    if (!avatarFile || !user) return null;
-    
-    setIsUploading(true);
-    
-    try {
-      const fileExt = avatarFile.name.split('.').pop();
-      const fileName = `${user.id}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-      const filePath = `avatars/${fileName}`;
-
-      const { error: uploadError, data } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, avatarFile, {
-          upsert: true,
-          contentType: avatarFile.type
-        });
-
-      if (uploadError) {
-        console.error('Error uploading avatar:', uploadError);
-        throw uploadError;
-      }
-
-      const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
-      console.log('Uploaded avatar URL:', urlData.publicUrl);
-      return urlData.publicUrl;
-    } catch (error) {
-      console.error('Error uploading avatar:', error);
-      toast({
-        title: "Error uploading avatar",
-        description: "Please try again later",
-        variant: "destructive"
-      });
-      return null;
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
     
     try {
+      setIsUploading(true);
       let avatarUrl = userData.avatar;
+      
       if (avatarFile) {
-        const newAvatarUrl = await uploadAvatar();
+        console.log('Uploading avatar file...');
+        const newAvatarUrl = await uploadAvatar(avatarFile, user.id);
         if (newAvatarUrl) {
+          console.log('Successfully uploaded avatar, new URL:', newAvatarUrl);
           avatarUrl = newAvatarUrl;
+        } else {
+          console.error('Failed to upload avatar');
+          toast({
+            title: "Avatar upload failed",
+            description: "Could not upload avatar, but continuing with other profile updates",
+            variant: "destructive"
+          });
         }
       }
       
-      await updateProfile({
+      const updatedProfile = {
         full_name: userData.name,
         username: userData.username,
         bio: userData.bio,
         avatar_url: avatarUrl,
-      });
+      };
       
+      console.log('Updating profile with:', updatedProfile);
+      await updateProfile(updatedProfile);
+      
+      // Update avatar key to force refresh
       setAvatarKey(Date.now());
       setIsEditing(false);
       setAvatarFile(null);
       setAvatarPreview(null);
+      
+      toast({
+        title: "Profil diperbarui",
+        description: "Informasi profil Anda berhasil disimpan"
+      });
     } catch (error) {
       console.error('Error updating profile:', error);
       toast({
@@ -142,6 +124,8 @@ const Profile = () => {
         description: "Terjadi kesalahan saat memperbarui profil",
         variant: "destructive"
       });
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -333,6 +317,7 @@ const Profile = () => {
                           <Avatar className="h-24 w-24 border-2 border-primary">
                             <AvatarImage 
                               src={avatarPreview || userData.avatar} 
+                              key={avatarKey}
                               alt={userData.name || "User avatar"} 
                             />
                             <AvatarFallback>{userData.name.charAt(0)}{userData.name.split(' ')[1]?.charAt(0) || ''}</AvatarFallback>

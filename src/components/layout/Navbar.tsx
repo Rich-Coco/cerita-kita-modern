@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -45,7 +44,7 @@ const Navbar = () => {
     if (profile?.avatar_url) {
       setAvatarKey(Date.now());
     }
-  }, [profile]);
+  }, [profile?.avatar_url]);
 
   const handleAuthNavigation = (type: 'login' | 'signup') => {
     if (type === 'login') {
@@ -124,7 +123,7 @@ const Navbar = () => {
                       <AvatarImage 
                         src={profile?.avatar_url} 
                         alt={profile?.username || user.email} 
-                        key={avatarKey} // Force re-render on profile change
+                        key={avatarKey}
                       />
                       <AvatarFallback>
                         {profile?.full_name ? profile.full_name.charAt(0) + (profile.full_name.split(' ')[1]?.charAt(0) || '') : user.email?.[0]}
@@ -184,7 +183,7 @@ const Navbar = () => {
                       <AvatarImage 
                         src={profile?.avatar_url} 
                         alt={profile?.username || user.email} 
-                        key={avatarKey} // Force re-render on profile change
+                        key={avatarKey}
                       />
                       <AvatarFallback>
                         {profile?.full_name ? profile.full_name.charAt(0) + (profile.full_name.split(' ')[1]?.charAt(0) || '') : user.email?.[0]}
