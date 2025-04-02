@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -120,8 +121,12 @@ const CoinsPage = () => {
     const urlWithCallback = new URL(paymentLink);
     
     if (user) {
-      const callbackUrl = new URL(window.location.href);
+      // Build an absolute URL for the callback
+      const appHost = window.location.origin;
+      const callbackUrl = new URL(`${appHost}/coins`);
       callbackUrl.searchParams.set('source', 'midtrans');
+      
+      // Add the callback URL to the payment link
       urlWithCallback.searchParams.append('finish_redirect_url', callbackUrl.toString());
     }
     
