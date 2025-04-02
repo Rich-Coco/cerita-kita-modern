@@ -158,7 +158,7 @@ const CoinsPage = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="max-w-5xl mx-auto">
           <div className="flex justify-between items-center mb-4">
             <TabsList>
-              <TabsTrigger value="packages">Paket Koin</TabsTrigger>
+              
               
             </TabsList>
             
