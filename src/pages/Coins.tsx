@@ -118,20 +118,35 @@ const CoinsPage = () => {
   };
 
   const handleDirectPaymentRedirect = (paymentLink: string) => {
-    const urlWithCallback = new URL(paymentLink);
-    
-    if (user) {
-      // Build an absolute URL for the callback
-      const appHost = window.location.origin;
-      const callbackUrl = new URL(`${appHost}/coins`);
-      callbackUrl.searchParams.set('source', 'midtrans');
+    try {
+      console.log('Starting direct payment redirect to:', paymentLink);
       
-      // Add the callback URL to the payment link
-      urlWithCallback.searchParams.append('finish_redirect_url', callbackUrl.toString());
+      const urlWithCallback = new URL(paymentLink);
+      
+      if (user) {
+        // Build an absolute URL for the callback with full protocol and domain
+        const appHost = window.location.origin;
+        
+        // Create complete callback URL that Midtrans will redirect to
+        const callbackUrl = `${appHost}/coins?source=midtrans`;
+        console.log('Setting callback URL to:', callbackUrl);
+        
+        // Add the callback URL to the payment link as a query parameter
+        urlWithCallback.searchParams.set('finish_redirect_url', callbackUrl);
+        
+        console.log('Final payment URL with callback:', urlWithCallback.toString());
+      }
+      
+      // Redirect to the Midtrans payment page
+      window.location.href = urlWithCallback.toString();
+    } catch (error) {
+      console.error('Error preparing payment redirect:', error);
+      toast({
+        title: 'Gagal membuka halaman pembayaran',
+        description: 'Terjadi kesalahan saat mempersiapkan halaman pembayaran',
+        variant: 'destructive'
+      });
     }
-    
-    console.log('Redirecting to direct payment link:', urlWithCallback.toString());
-    window.location.href = urlWithCallback.toString();
   };
 
   return <MainLayout>

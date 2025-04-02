@@ -420,9 +420,9 @@ serve(async (req) => {
         .from("transactions")
         .select("*")
         .eq("midtrans_order_id", order_id)
-        .single();
+        .maybeSingle();
       
-      if (checkError && checkError.code !== "PGRST116") { // PGRST116 is "no rows returned" error
+      if (checkError) {
         console.error("Error checking for existing transaction:", checkError);
         return new Response(
           JSON.stringify({ error: "Failed to check for existing transaction" }),
