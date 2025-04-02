@@ -42,4 +42,16 @@ export interface PurchasedChapter {
   story_id: string;
   purchased_at: string;
   price_paid: number;
+  updated_at?: string;
+}
+
+// This interface helps with the TypeScript type casting from Supabase
+export interface SupabasePurchasedChapter {
+  id: string;
+  user_id: string;
+  chapter_id: string;
+  story_id: string;
+  purchased_at: string;
+  price_paid: number;
+  updated_at: string;
 }

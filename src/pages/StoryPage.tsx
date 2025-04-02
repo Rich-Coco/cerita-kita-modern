@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { stories } from '@/data/stories';
-import { Story, Chapter, PurchasedChapter } from '@/types/story';
+import { Story, Chapter, PurchasedChapter, SupabasePurchasedChapter } from '@/types/story';
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -66,8 +66,9 @@ const StoryPage = () => {
             variant: "destructive",
           });
         } else {
-          setPurchasedChapters(data || []);
-          console.log('Purchased chapters:', data);
+          const typedData = data as unknown as SupabasePurchasedChapter[];
+          setPurchasedChapters(typedData || []);
+          console.log('Purchased chapters:', typedData);
         }
       } catch (err) {
         console.error('Error in purchased chapters fetch:', err);
@@ -157,7 +158,7 @@ const StoryPage = () => {
         throw purchaseError;
       }
 
-      const { data: updatedPurchases, error: fetchError } = await supabase
+      const { data, error: fetchError } = await supabase
         .from('purchased_chapters')
         .select('*')
         .eq('user_id', user.id)
@@ -167,7 +168,8 @@ const StoryPage = () => {
         throw fetchError;
       }
 
-      setPurchasedChapters(updatedPurchases || []);
+      const typedData = data as unknown as SupabasePurchasedChapter[];
+      setPurchasedChapters(typedData || []);
 
       if (typeof profile.coins === 'number') {
         toast({
