@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
+import { Slider } from '@/components/ui/slider';
 import { toast } from '@/components/ui/use-toast';
 import { Plus, X, Upload, Check, FileText, ChevronRight, Coins } from 'lucide-react';
 import { StoryFormData, Story } from '@/types/story';
@@ -63,6 +64,7 @@ const Publish = () => {
   const [chapterTitle, setChapterTitle] = useState('');
   const [chapterContent, setChapterContent] = useState('');
   const [isPremium, setIsPremium] = useState(false);
+  const [coinPrice, setCoinPrice] = useState(1);
   
   const [formErrors, setFormErrors] = useState({
     title: false,
@@ -175,6 +177,7 @@ const Publish = () => {
         title: chapterTitle,
         content: chapterContent,
         isPremium,
+        coinPrice: isPremium ? coinPrice : undefined,
       };
       
       setFormData({
@@ -185,6 +188,7 @@ const Publish = () => {
       setChapterTitle('');
       setChapterContent('');
       setIsPremium(false);
+      setCoinPrice(1);
       
       toast({
         title: "Chapter Ditambahkan",
@@ -225,6 +229,7 @@ const Publish = () => {
         title: chapter.title,
         content: chapter.content,
         isPremium: chapter.isPremium,
+        coinPrice: chapter.coinPrice,
       })),
     };
     
@@ -483,7 +488,8 @@ const Publish = () => {
                                   <span className="text-sm text-muted-foreground">Chapter {index + 1}</span>
                                   {chapter.isPremium && (
                                     <Badge variant="outline" className="bg-black/20 text-yellow-400 text-xs">
-                                      <Coins size={10} className="mr-1" /> Premium
+                                      <Coins size={10} className="mr-1" /> 
+                                      {chapter.coinPrice || 1} Coin{chapter.coinPrice !== 1 ? 's' : ''}
                                     </Badge>
                                   )}
                                 </div>
@@ -556,15 +562,65 @@ const Publish = () => {
                     </p>
                   </div>
                   
-                  <div className="flex items-center space-x-2">
-                    <Switch 
-                      id="premium"
-                      checked={isPremium}
-                      onCheckedChange={setIsPremium}
-                    />
-                    <Label htmlFor="premium" className="flex items-center gap-1 cursor-pointer">
-                      Chapter Premium <Coins size={14} className="text-yellow-400" />
-                    </Label>
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-2">
+                      <Switch 
+                        id="premium"
+                        checked={isPremium}
+                        onCheckedChange={setIsPremium}
+                      />
+                      <Label htmlFor="premium" className="flex items-center gap-1 cursor-pointer">
+                        Chapter Premium <Coins size={14} className="text-yellow-400" />
+                      </Label>
+                    </div>
+                    
+                    {isPremium && (
+                      <div className="pl-8 space-y-2 border-l-2 border-yellow-200 ml-2">
+                        <Label className="flex justify-between">
+                          <span>Harga Chapter (Coin)</span>
+                          <span className="font-bold text-yellow-500 flex items-center">
+                            <Coins size={14} className="mr-1" />
+                            {coinPrice}
+                          </span>
+                        </Label>
+                        <div className="flex items-center gap-4">
+                          <Slider
+                            value={[coinPrice]}
+                            min={1}
+                            max={5}
+                            step={1}
+                            onValueChange={(value) => setCoinPrice(value[0])}
+                            className="flex-1"
+                          />
+                          <div className="flex items-center gap-1 w-16">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => setCoinPrice(Math.max(1, coinPrice - 1))}
+                              disabled={coinPrice <= 1}
+                            >
+                              <span>-</span>
+                            </Button>
+                            <span className="w-6 text-center">{coinPrice}</span>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => setCoinPrice(Math.min(5, coinPrice + 1))}
+                              disabled={coinPrice >= 5}
+                            >
+                              <span>+</span>
+                            </Button>
+                          </div>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          Tetapkan harga antara 1-5 coin untuk chapter premium ini
+                        </p>
+                      </div>
+                    )}
                   </div>
                   
                   <div className="flex items-center justify-between pt-4 border-t border-border mt-6">
@@ -674,7 +730,8 @@ const Publish = () => {
                             
                             {chapter.isPremium && (
                               <Badge variant="outline" className="bg-black/20 text-yellow-400 text-xs">
-                                <Coins size={10} className="mr-1" /> Premium
+                                <Coins size={10} className="mr-1" /> 
+                                {chapter.coinPrice || 1} Coin{chapter.coinPrice !== 1 ? 's' : ''}
                               </Badge>
                             )}
                           </div>
