@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -67,31 +66,23 @@ const ProfileSetup = () => {
       const fileName = `${user.id}-${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = `avatars/${fileName}`;
 
-      // Check if avatars bucket exists, create it if it doesn't
-      const { data: buckets } = await supabase.storage.listBuckets();
-      const avatarBucketExists = buckets?.some(bucket => bucket.name === 'avatars');
-      
-      if (!avatarBucketExists) {
-        const { error: createBucketError } = await supabase.storage.createBucket('avatars', {
-          public: true
-        });
-        
-        if (createBucketError) {
-          console.error('Error creating avatars bucket:', createBucketError);
-          throw createBucketError;
-        }
-      }
-
-      const { error: uploadError } = await supabase.storage
+      // Upload the file to the avatars bucket
+      const { error: uploadError, data } = await supabase.storage
         .from('avatars')
-        .upload(filePath, avatarFile);
+        .upload(filePath, avatarFile, {
+          upsert: true,
+          contentType: avatarFile.type
+        });
 
       if (uploadError) {
+        console.error('Error uploading avatar:', uploadError);
         throw uploadError;
       }
 
-      const { data } = supabase.storage.from('avatars').getPublicUrl(filePath);
-      return data.publicUrl;
+      // Get the public URL
+      const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
+      console.log('Uploaded avatar URL:', urlData.publicUrl);
+      return urlData.publicUrl;
     } catch (error) {
       console.error('Error uploading avatar:', error);
       toast({
