@@ -151,8 +151,7 @@ const CoinsPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {coinPackages.map(pkg => <Card key={pkg.id} className={`relative overflow-hidden backdrop-blur-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${pkg.popular ? 'border-primary bg-card/95 shadow-lg' : 'bg-card/60'}`}>
                   {pkg.popular && <div className="absolute -top-4 -right-12 rotate-45 bg-primary px-12 py-1 text-xs font-medium text-primary-foreground">
-                      Populer
-                    </div>}
+              </div>}
                   
                   <CardHeader className="text-center pb-2">
                     <CardTitle className="text-xl">{pkg.name}</CardTitle>
