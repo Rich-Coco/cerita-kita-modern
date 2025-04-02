@@ -10,13 +10,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/hooks/use-toast';
-import { User, Bookmark, BookOpen, Settings, Pencil, Save, Coins, Heart, Eye, Upload, Loader2 } from 'lucide-react';
+import { User, Bookmark, BookOpen, Settings, Pencil, Save, Coins, Heart, Eye, Upload, Loader2, Wallet } from 'lucide-react';
 import StoryCard from '@/components/story/StoryCard';
 import { stories } from '@/data/stories';
 import MainLayout from '@/components/layout/MainLayout';
 import { useAuth } from '@/hooks/useAuth';
 import { format } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
+import { Coins as CoinsDisplay } from '@/components/ui/coins';
 
 const Profile = () => {
   const [profileTab, setProfileTab] = useState('stories');
@@ -210,25 +211,53 @@ const Profile = () => {
                       </div>
                     </div>
                   </div>
-                  
-                  <div className="mt-4 w-full grid grid-cols-2 gap-2">
-                    <Button asChild variant="outline" className="w-full">
-                      <Link to="/coins">
-                        <Coins size={16} className="mr-2 text-yellow-400" />
-                        Beli Koin
-                      </Link>
-                    </Button>
-                    
-                    <Button asChild variant="outline" className="w-full">
-                      <Link to="/publish">
-                        <Pencil size={16} className="mr-2" />
-                        Tulis Cerita
-                      </Link>
-                    </Button>
-                  </div>
                 </div>
               </CardContent>
             </Card>
+
+            {/* New Wallet Card */}
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex flex-col items-center text-center">
+                  <div className="h-12 w-12 bg-yellow-100 rounded-full flex items-center justify-center mb-3">
+                    <Wallet className="h-6 w-6 text-yellow-600" />
+                  </div>
+                  <h3 className="font-medium text-lg mb-1">Wallet Anda</h3>
+                  
+                  <div className="flex items-center gap-2 text-2xl font-bold mt-2">
+                    <CoinsDisplay size="lg" />
+                    <span>{userData.coins}</span>
+                  </div>
+                  
+                  <p className="text-sm text-muted-foreground mt-1 mb-4">
+                    Koin dapat digunakan untuk membuka konten premium
+                  </p>
+                  
+                  <Button asChild variant="default" className="w-full">
+                    <Link to="/coins">
+                      <Coins size={16} className="mr-2" />
+                      Beli Koin
+                    </Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <div className="grid grid-cols-2 gap-2">
+              <Button asChild variant="outline" className="w-full">
+                <Link to="/coins">
+                  <Coins size={16} className="mr-2 text-yellow-400" />
+                  Beli Koin
+                </Link>
+              </Button>
+              
+              <Button asChild variant="outline" className="w-full">
+                <Link to="/publish">
+                  <Pencil size={16} className="mr-2" />
+                  Tulis Cerita
+                </Link>
+              </Button>
+            </div>
           </div>
           
           <div>
