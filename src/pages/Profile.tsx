@@ -15,6 +15,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { format } from 'date-fns';
 import { uploadAvatar } from '@/utils/storage';
 import { Coins as CoinsDisplay } from '@/components/ui/coins';
+import { stories } from '@/data/stories';
 
 const Profile = () => {
   const [profileTab, setProfileTab] = useState('stories');
