@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { stories } from '@/data/stories';
@@ -31,11 +32,14 @@ import {
 } from '@/components/ui/pagination';
 import { toast } from '@/hooks/use-toast';
 import { Coins } from '@/components/ui/coins';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 
 const StoryPage = () => {
   const { id } = useParams<{ id: string }>();
   const [currentChapterIndex, setCurrentChapterIndex] = useState(0);
   const [isReading, setIsReading] = useState(false);
+  const { user, profile } = useAuth();
 
   const story = stories.find(s => s.id === id);
 
@@ -70,10 +74,32 @@ const StoryPage = () => {
     }
   };
 
-  const handlePremiumContent = () => {
+  const handlePurchaseChapter = async () => {
+    if (!user || !profile) {
+      toast({
+        title: "Login Diperlukan",
+        description: "Anda perlu login untuk membeli chapter premium.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const chapterPrice = currentChapter.coinPrice || 1;
+    
+    if (profile.coins < chapterPrice) {
+      toast({
+        title: "Koin Tidak Cukup",
+        description: `Anda membutuhkan ${chapterPrice} koin untuk membeli chapter ini. Silakan beli koin terlebih dahulu.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Here we would typically make a call to the backend to process the purchase
+    // For now, we'll just show a success message
     toast({
-      title: "Konten Premium",
-      description: "Anda perlu berlangganan untuk mengakses konten premium.",
+      title: "Pembelian Berhasil",
+      description: `Anda telah membeli chapter premium dengan ${chapterPrice} koin.`,
       variant: "default",
     });
   };
@@ -191,7 +217,13 @@ const StoryPage = () => {
                   </div>
                   
                   {chapter.isPremium && (
-                    <Lock size={16} className="text-amber-500" />
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1 bg-amber-500/10 px-2 py-1 rounded">
+                        <Coins size="sm" />
+                        <span className="text-amber-600 font-medium">{chapter.coinPrice || 1}</span>
+                      </div>
+                      <Lock size={16} className="text-amber-500" />
+                    </div>
                   )}
                 </div>
               ))}
@@ -204,6 +236,7 @@ const StoryPage = () => {
 
   const ReadingView = () => {
     const isPremiumLocked = currentChapter.isPremium;
+    const chapterPrice = currentChapter.coinPrice || 1;
     
     return (
       <div className="bg-background min-h-screen">
@@ -247,15 +280,43 @@ const StoryPage = () => {
               <Lock size={48} className="text-amber-500 mb-2" />
               <h3 className="text-xl font-bold text-center">Konten Premium</h3>
               <p className="text-center text-muted-foreground max-w-md">
-                Bab ini hanya tersedia untuk pembaca premium. Berlangganan sekarang untuk mendapatkan akses ke semua konten premium.
+                Bab ini hanya tersedia untuk pembaca premium. Gunakan koin untuk membaca chapter ini.
               </p>
-              <Button 
-                className="mt-4 bg-gradient-to-r from-amber-500 to-amber-600"
-                onClick={handlePremiumContent}
-              >
-                <Coins className="mr-2 h-4 w-4" />
-                Berlangganan Premium
-              </Button>
+              <div className="flex items-center gap-2 bg-amber-500/10 px-4 py-2 rounded-lg mt-2">
+                <Coins size="lg" />
+                <span className="text-xl font-bold text-amber-600">{chapterPrice}</span>
+              </div>
+              
+              {user ? (
+                <Button 
+                  className="mt-4 bg-gradient-to-r from-amber-500 to-amber-600"
+                  onClick={handlePurchaseChapter}
+                >
+                  <Coins className="mr-2 h-4 w-4" />
+                  Beli Chapter Ini
+                </Button>
+              ) : (
+                <Button 
+                  className="mt-4"
+                  asChild
+                >
+                  <Link to="/auth">
+                    Login untuk Melanjutkan
+                  </Link>
+                </Button>
+              )}
+              {profile && profile.coins < chapterPrice && (
+                <Button 
+                  variant="outline"
+                  className="mt-2"
+                  asChild
+                >
+                  <Link to="/coins">
+                    <Coins className="mr-2 h-4 w-4" />
+                    Beli Koin
+                  </Link>
+                </Button>
+              )}
             </div>
           ) : (
             <div>

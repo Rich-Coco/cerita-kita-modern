@@ -4,6 +4,7 @@ export interface Chapter {
   title: string;
   content: string;
   isPremium: boolean;
+  coinPrice?: number; // Price in coins (1-5)
 }
 
 export interface Story {
@@ -30,5 +31,6 @@ export interface StoryFormData {
     title: string;
     content: string;
     isPremium: boolean;
+    coinPrice?: number;
   }[];
 }

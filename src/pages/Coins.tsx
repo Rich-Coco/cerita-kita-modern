@@ -19,7 +19,7 @@ const coinPackages: PackageType[] = [{
   coins: 10,
   price: 'Rp 10.000',
   priceValue: 10000,
-  features: ['Akses ke 1 chapter premium', 'Berlaku selamanya', 'Tidak ada batasan waktu'],
+  features: ['Akses ke 1-10 chapter premium', 'Berlaku selamanya', 'Tidak ada batasan waktu'],
   popular: false,
   paymentLink: 'https://app.sandbox.midtrans.com/payment-links/1743586146943'
 }, {
@@ -28,7 +28,7 @@ const coinPackages: PackageType[] = [{
   coins: 30,
   price: 'Rp 30.000',
   priceValue: 30000,
-  features: ['Akses ke 5 chapter premium', 'Diskon 15% dari harga per koin', 'Hadiah bonus badge profil', 'Berlaku selamanya'],
+  features: ['Akses ke 10-30 chapter premium', 'Diskon 15% dari harga per koin', 'Hadiah bonus badge profil', 'Berlaku selamanya'],
   popular: true
 }, {
   id: 'ultimate',
@@ -36,7 +36,7 @@ const coinPackages: PackageType[] = [{
   coins: 50,
   price: 'Rp 50.000',
   priceValue: 50000,
-  features: ['Akses ke 20 chapter premium', 'Diskon 30% dari harga per koin', 'Hadiah bonus badge profil eksklusif', 'Fitur highlight komentar', 'Berlaku selamanya'],
+  features: ['Akses ke 20-50 chapter premium', 'Diskon 30% dari harga per koin', 'Hadiah bonus badge profil eksklusif', 'Fitur highlight komentar', 'Berlaku selamanya'],
   popular: false
 }];
 
@@ -249,7 +249,7 @@ const CoinsPage = () => {
               </div>
               <h4 className="font-medium">Buka Konten Premium</h4>
               <p className="text-sm text-muted-foreground">
-                Gunakan koin untuk mengakses chapter premium dari cerita favorit anda.
+                Gunakan koin untuk mengakses chapter premium dari cerita favorit anda. Harga tiap chapter bervariasi dari 1-5 koin.
               </p>
             </div>
             
