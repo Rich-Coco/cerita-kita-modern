@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -89,6 +90,8 @@ const CoinsPage = () => {
               description: `${data.coins_added || 10} koin telah ditambahkan ke akun Anda`
             });
             window.history.replaceState({}, document.title, window.location.pathname);
+            
+            // Refresh the page to update the UI with new coin balance
             window.location.reload();
           } else if (data.status === 'exists') {
             toast({

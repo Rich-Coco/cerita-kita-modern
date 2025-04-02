@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { CreditCard, Loader2 } from 'lucide-react';
@@ -6,6 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { PackageType } from '@/types/payment';
+import { useNavigate } from 'react-router-dom';
 
 declare global {
   interface Window {
@@ -25,10 +25,10 @@ const MidtransPayment = ({ packageData, onSuccess, onError }: MidtransPaymentPro
   const { toast } = useToast();
   const { user, profile } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
   
   const loadMidtransScript = (clientKey: string): Promise<void> => {
     return new Promise((resolve, reject) => {
-      // Check if script is already loaded
       if (window.snap) {
         resolve();
         return;
@@ -70,7 +70,6 @@ const MidtransPayment = ({ packageData, onSuccess, onError }: MidtransPaymentPro
       
       console.log("Sending payment request with payload:", payload);
       
-      // Call Supabase Edge Function to create payment
       const { data, error } = await supabase.functions.invoke("midtrans", {
         body: {
           action: "create_payment",
@@ -105,7 +104,6 @@ const MidtransPayment = ({ packageData, onSuccess, onError }: MidtransPaymentPro
         return;
       }
       
-      // Load Midtrans script
       try {
         await loadMidtransScript(data.client_key);
       } catch (error) {
@@ -120,7 +118,6 @@ const MidtransPayment = ({ packageData, onSuccess, onError }: MidtransPaymentPro
         return;
       }
       
-      // Open Midtrans Snap payment page
       if (window.snap) {
         window.snap.pay(data.token, {
           onSuccess: () => {
@@ -130,6 +127,8 @@ const MidtransPayment = ({ packageData, onSuccess, onError }: MidtransPaymentPro
             });
             checkTransactionStatus(data.transaction_id);
             if (onSuccess) onSuccess();
+            
+            navigate('/coins');
           },
           onPending: () => {
             toast({
@@ -158,7 +157,6 @@ const MidtransPayment = ({ packageData, onSuccess, onError }: MidtransPaymentPro
           }
         });
       } else {
-        // Fallback for when Snap isn't available
         console.error("Midtrans Snap not loaded properly");
         toast({
           title: "Gagal memuat pembayaran",
@@ -181,12 +179,9 @@ const MidtransPayment = ({ packageData, onSuccess, onError }: MidtransPaymentPro
   
   const checkTransactionStatus = async (transactionId: string) => {
     try {
-      // Poll transaction status a few times
       for (let i = 0; i < 3; i++) {
-        // Wait a moment before checking (give backend time to process)
         await new Promise(resolve => setTimeout(resolve, 2000));
         
-        // Call Edge Function to check transaction status
         const { data, error } = await supabase.functions.invoke("midtrans", {
           body: {
             action: "check_status",
@@ -208,6 +203,8 @@ const MidtransPayment = ({ packageData, onSuccess, onError }: MidtransPaymentPro
           });
           if (onSuccess) onSuccess();
           setIsLoading(false);
+          
+          navigate('/coins');
           return;
         } else if (data.status === "failed") {
           toast({
@@ -221,7 +218,6 @@ const MidtransPayment = ({ packageData, onSuccess, onError }: MidtransPaymentPro
         }
       }
       
-      // If we get here, status is still pending after polling
       toast({
         title: "Status pembayaran",
         description: "Pembayaran masih diproses. Koin akan ditambahkan otomatis setelah pembayaran selesai."
