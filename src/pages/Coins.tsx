@@ -21,7 +21,7 @@ const coinPackages: PackageType[] = [{
   priceValue: 10000,
   features: ['Akses ke 1 chapter premium', 'Berlaku selamanya', 'Tidak ada batasan waktu'],
   popular: false,
-  paymentLink: 'https://app.sandbox.midtrans.com/payment-links/1743496234905'
+  paymentLink: 'https://app.sandbox.midtrans.com/payment-links/1743586146943'
 }, {
   id: 'premium',
   name: 'Paket Premium',
