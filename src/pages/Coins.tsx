@@ -11,6 +11,7 @@ import { PackageType } from '@/types/payment';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+
 const coinPackages: PackageType[] = [{
   id: 'basic',
   name: 'Paket Dasar',
@@ -37,6 +38,7 @@ const coinPackages: PackageType[] = [{
   features: ['Akses ke 20 chapter premium', 'Diskon 30% dari harga per koin', 'Hadiah bonus badge profil eksklusif', 'Fitur highlight komentar', 'Berlaku selamanya'],
   popular: false
 }];
+
 const CoinsPage = () => {
   const {
     user,
@@ -44,16 +46,20 @@ const CoinsPage = () => {
   } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('packages');
+
   useEffect(() => {
     const handleDirectPaymentCallback = async () => {
       if (!user) return;
+      
       const url = new URL(window.location.href);
       const orderId = url.searchParams.get('order_id');
       const status = url.searchParams.get('transaction_status');
       const source = url.searchParams.get('source');
+      
       if (orderId && status === 'settlement' && source === 'midtrans') {
         try {
           console.log('Processing direct payment callback:', orderId);
+          
           const {
             data,
             error
@@ -66,6 +72,7 @@ const CoinsPage = () => {
               }
             }
           });
+          
           if (error) {
             console.error('Error processing direct payment:', error);
             toast({
@@ -75,6 +82,7 @@ const CoinsPage = () => {
             });
             return;
           }
+          
           if (data.success) {
             toast({
               title: 'Pembayaran berhasil!',
@@ -94,23 +102,30 @@ const CoinsPage = () => {
         }
       }
     };
+    
     handleDirectPaymentCallback();
   }, [user]);
+
   const handlePaymentSuccess = () => {
     window.location.reload();
   };
+
   const handlePaymentError = (error: string) => {
     console.error('Payment error:', error);
   };
+
   const handleDirectPaymentRedirect = (paymentLink: string) => {
     const urlWithCallback = new URL(paymentLink);
+    
     if (user) {
       const callbackUrl = new URL(window.location.href);
       callbackUrl.searchParams.set('source', 'midtrans');
       urlWithCallback.searchParams.append('finish_redirect_url', callbackUrl.toString());
     }
+    
     window.location.href = urlWithCallback.toString();
   };
+
   return <MainLayout>
       <div className="py-8 md:py-16 max-w-7xl mx-auto px-4 md:px-6">
         <div className="max-w-3xl mx-auto text-center mb-8">
@@ -235,4 +250,5 @@ const CoinsPage = () => {
       </div>
     </MainLayout>;
 };
+
 export default CoinsPage;
