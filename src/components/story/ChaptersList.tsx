@@ -11,6 +11,7 @@ interface ChaptersListProps {
 }
 
 const ChaptersList = ({ chapters, purchasedChapters = [], onSelectChapter }: ChaptersListProps) => {
+  // Updated function to correctly check if a chapter is purchased
   const isChapterPurchased = (chapterId: string) => {
     return purchasedChapters.some(pc => pc.chapter_id === chapterId);
   };
