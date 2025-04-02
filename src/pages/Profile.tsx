@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -34,11 +33,10 @@ const Profile = () => {
     joined: ''
   });
 
-  // Avatar file state
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [avatarKey, setAvatarKey] = useState(Date.now());
 
-  // Initialize user data from profile
   useEffect(() => {
     if (profile) {
       setUserData({
@@ -50,10 +48,10 @@ const Profile = () => {
         coins: profile.coins || 0,
         joined: formatDate(profile.created_at)
       });
+      setAvatarKey(Date.now());
     }
   }, [profile, user]);
 
-  // Format date helper function
   const formatDate = (dateString) => {
     if (!dateString) return '';
     try {
@@ -68,7 +66,6 @@ const Profile = () => {
     const file = e.target.files?.[0];
     if (file) {
       setAvatarFile(file);
-      // Create a preview URL
       const reader = new FileReader();
       reader.onloadend = () => {
         setAvatarPreview(reader.result as string);
@@ -87,31 +84,21 @@ const Profile = () => {
       const fileName = `${user.id}-${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = `avatars/${fileName}`;
 
-      // Check if avatars bucket exists, create it if it doesn't
-      const { data: buckets } = await supabase.storage.listBuckets();
-      const avatarBucketExists = buckets?.some(bucket => bucket.name === 'avatars');
-      
-      if (!avatarBucketExists) {
-        const { error: createBucketError } = await supabase.storage.createBucket('avatars', {
-          public: true
-        });
-        
-        if (createBucketError) {
-          console.error('Error creating avatars bucket:', createBucketError);
-          throw createBucketError;
-        }
-      }
-
-      const { error: uploadError } = await supabase.storage
+      const { error: uploadError, data } = await supabase.storage
         .from('avatars')
-        .upload(filePath, avatarFile);
+        .upload(filePath, avatarFile, {
+          upsert: true,
+          contentType: avatarFile.type
+        });
 
       if (uploadError) {
+        console.error('Error uploading avatar:', uploadError);
         throw uploadError;
       }
 
-      const { data } = supabase.storage.from('avatars').getPublicUrl(filePath);
-      return data.publicUrl;
+      const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
+      console.log('Uploaded avatar URL:', urlData.publicUrl);
+      return urlData.publicUrl;
     } catch (error) {
       console.error('Error uploading avatar:', error);
       toast({
@@ -129,7 +116,6 @@ const Profile = () => {
     e.preventDefault();
     
     try {
-      // Upload avatar if changed
       let avatarUrl = userData.avatar;
       if (avatarFile) {
         const newAvatarUrl = await uploadAvatar();
@@ -145,6 +131,7 @@ const Profile = () => {
         avatar_url: avatarUrl,
       });
       
+      setAvatarKey(Date.now());
       setIsEditing(false);
       setAvatarFile(null);
       setAvatarPreview(null);
@@ -158,7 +145,6 @@ const Profile = () => {
     }
   };
 
-  // Reset form when canceling edit
   const handleCancelEdit = () => {
     setIsEditing(false);
     setAvatarFile(null);
@@ -188,7 +174,11 @@ const Profile = () => {
               <CardContent className="pt-0">
                 <div className="flex flex-col items-center -mt-12">
                   <Avatar className="h-24 w-24 border-4 border-background">
-                    <AvatarImage src={userData.avatar} />
+                    <AvatarImage 
+                      src={userData.avatar} 
+                      key={avatarKey}
+                      alt={userData.name || "User avatar"} 
+                    />
                     <AvatarFallback>
                       {userData.name ? userData.name.charAt(0) + (userData.name.split(' ')[1]?.charAt(0) || '') : ''}
                     </AvatarFallback>
@@ -215,7 +205,6 @@ const Profile = () => {
               </CardContent>
             </Card>
 
-            {/* New Wallet Card */}
             <Card>
               <CardContent className="pt-6">
                 <div className="flex flex-col items-center text-center">
@@ -342,7 +331,10 @@ const Profile = () => {
                       <div className="flex justify-center mb-4">
                         <div className="relative">
                           <Avatar className="h-24 w-24 border-2 border-primary">
-                            <AvatarImage src={avatarPreview || userData.avatar} />
+                            <AvatarImage 
+                              src={avatarPreview || userData.avatar} 
+                              alt={userData.name || "User avatar"} 
+                            />
                             <AvatarFallback>{userData.name.charAt(0)}{userData.name.split(' ')[1]?.charAt(0) || ''}</AvatarFallback>
                           </Avatar>
                           

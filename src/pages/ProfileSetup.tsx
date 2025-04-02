@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -22,10 +23,12 @@ const ProfileSetup = () => {
     bio: "",
     avatar_url: "",
   });
-
+  
   // Preview the avatar before upload
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  // Add a force refresh key for avatar
+  const [avatarKey, setAvatarKey] = useState(Date.now());
 
   useEffect(() => {
     if (profile) {
@@ -35,6 +38,7 @@ const ProfileSetup = () => {
         bio: profile.bio || "",
         avatar_url: profile.avatar_url || "",
       });
+      setAvatarKey(Date.now()); // Force refresh avatar
     }
   }, [profile]);
 
@@ -66,7 +70,7 @@ const ProfileSetup = () => {
       const fileName = `${user.id}-${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = `avatars/${fileName}`;
 
-      // Upload the file to the avatars bucket
+      // Upload the file to the avatars bucket with contentType
       const { error: uploadError, data } = await supabase.storage
         .from('avatars')
         .upload(filePath, avatarFile, {
@@ -129,6 +133,9 @@ const ProfileSetup = () => {
         avatar_url: avatarUrl,
       });
 
+      // Force refresh avatar
+      setAvatarKey(Date.now());
+
       toast({
         title: "Profile updated",
         description: "Your profile has been successfully updated",
@@ -163,7 +170,10 @@ const ProfileSetup = () => {
               <div className="flex justify-center">
                 <div className="relative">
                   <Avatar className="h-24 w-24 border-2 border-primary">
-                    <AvatarImage src={avatarPreview || profileData.avatar_url} />
+                    <AvatarImage 
+                      src={avatarPreview || profileData.avatar_url} 
+                      key={avatarKey} // Force refresh when avatar changes
+                    />
                     <AvatarFallback className="bg-primary/20">
                       <User className="h-12 w-12 text-muted-foreground" />
                     </AvatarFallback>
