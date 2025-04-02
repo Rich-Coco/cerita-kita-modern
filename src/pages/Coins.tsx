@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,7 +11,6 @@ import { PackageType } from '@/types/payment';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-
 const coinPackages: PackageType[] = [{
   id: 'basic',
   name: 'Paket Dasar',
@@ -39,7 +37,6 @@ const coinPackages: PackageType[] = [{
   features: ['Akses ke 20-50 chapter premium', 'Diskon 30% dari harga per koin', 'Hadiah bonus badge profil eksklusif', 'Fitur highlight komentar', 'Berlaku selamanya'],
   popular: false
 }];
-
 const CoinsPage = () => {
   const {
     user,
@@ -47,20 +44,16 @@ const CoinsPage = () => {
   } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('packages');
-
   useEffect(() => {
     const handleDirectPaymentCallback = async () => {
       if (!user) return;
-      
       const url = new URL(window.location.href);
       const orderId = url.searchParams.get('order_id');
       const status = url.searchParams.get('transaction_status');
       const source = url.searchParams.get('source');
-      
       if (orderId && status === 'settlement' && source === 'midtrans') {
         try {
           console.log('Processing direct payment callback:', orderId);
-          
           const {
             data,
             error
@@ -73,7 +66,6 @@ const CoinsPage = () => {
               }
             }
           });
-          
           if (error) {
             console.error('Error processing direct payment:', error);
             toast({
@@ -83,14 +75,13 @@ const CoinsPage = () => {
             });
             return;
           }
-          
           if (data.success) {
             toast({
               title: 'Pembayaran berhasil!',
               description: `${data.coins_added || 10} koin telah ditambahkan ke akun Anda`
             });
             window.history.replaceState({}, document.title, window.location.pathname);
-            
+
             // Refresh the page to update the UI with new coin balance
             window.location.reload();
           } else if (data.status === 'exists') {
@@ -105,38 +96,31 @@ const CoinsPage = () => {
         }
       }
     };
-    
     handleDirectPaymentCallback();
   }, [user]);
-
   const handlePaymentSuccess = () => {
     window.location.reload();
   };
-
   const handlePaymentError = (error: string) => {
     console.error('Payment error:', error);
   };
-
   const handleDirectPaymentRedirect = (paymentLink: string) => {
     try {
       console.log('Starting direct payment redirect to:', paymentLink);
-      
       const urlWithCallback = new URL(paymentLink);
-      
       if (user) {
         // Build an absolute URL for the callback with full protocol and domain
         const appHost = window.location.origin;
-        
+
         // Create complete callback URL that Midtrans will redirect to
         const callbackUrl = `${appHost}/coins?source=midtrans`;
         console.log('Setting callback URL to:', callbackUrl);
-        
+
         // Add the callback URL to the payment link as a query parameter
         urlWithCallback.searchParams.set('finish_redirect_url', callbackUrl);
-        
         console.log('Final payment URL with callback:', urlWithCallback.toString());
       }
-      
+
       // Redirect to the Midtrans payment page
       window.location.href = urlWithCallback.toString();
     } catch (error) {
@@ -148,7 +132,6 @@ const CoinsPage = () => {
       });
     }
   };
-
   return <MainLayout>
       <div className="py-8 md:py-16 max-w-7xl mx-auto px-4 md:px-6">
         <div className="max-w-3xl mx-auto text-center mb-8">
@@ -176,7 +159,7 @@ const CoinsPage = () => {
           <div className="flex justify-between items-center mb-4">
             <TabsList>
               <TabsTrigger value="packages">Paket Koin</TabsTrigger>
-              <TabsTrigger value="history">Riwayat Transaksi</TabsTrigger>
+              
             </TabsList>
             
             <Button variant="outline" size="sm" onClick={() => navigate(-1)}>
@@ -273,5 +256,4 @@ const CoinsPage = () => {
       </div>
     </MainLayout>;
 };
-
 export default CoinsPage;
