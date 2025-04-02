@@ -52,7 +52,15 @@ export const usePurchasedChapters = (userId: string | undefined, storyId: string
     storyId: string, 
     chapterPrice: number
   ) => {
+    console.log('Purchase chapter with params:', {
+      userId: user.id,
+      chapterId,
+      storyId,
+      price: chapterPrice
+    });
+
     try {
+      // First update the user's coins
       const { error: profileUpdateError } = await supabase
         .from('profiles')
         .update({ 
@@ -64,19 +72,26 @@ export const usePurchasedChapters = (userId: string | undefined, storyId: string
         throw profileUpdateError;
       }
 
+      // Insert the purchase record
+      const purchaseData = {
+        user_id: user.id,
+        chapter_id: chapterId,
+        story_id: storyId,
+        price_paid: chapterPrice
+      };
+      
+      console.log('Inserting purchase record:', purchaseData);
+      
       const { error: purchaseError } = await supabase
         .from('purchased_chapters')
-        .insert({
-          user_id: user.id,
-          chapter_id: chapterId,
-          story_id: storyId,
-          price_paid: chapterPrice
-        });
+        .insert(purchaseData);
 
       if (purchaseError) {
+        console.error('Error in purchase insert:', purchaseError);
         throw purchaseError;
       }
 
+      // Fetch the updated purchased chapters list
       const { data, error: fetchError } = await supabase
         .from('purchased_chapters')
         .select('*')

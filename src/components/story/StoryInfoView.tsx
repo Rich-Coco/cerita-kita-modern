@@ -1,16 +1,14 @@
 
 import React from 'react';
-import { Story } from '@/types/story';
-import { Link } from 'react-router-dom';
+import { Story, PurchasedChapter } from '@/types/story';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { ChevronLeft, BookOpen, BookmarkPlus, Calendar, Eye, Heart } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
+import { Eye, Heart, Calendar, Bookmark, Play } from 'lucide-react';
 import ChaptersList from './ChaptersList';
 
 interface StoryInfoViewProps {
   story: Story;
+  purchasedChapters?: PurchasedChapter[];
   onStartReading: () => void;
   onSelectChapter: (index: number) => void;
   onBookmark: () => void;
@@ -18,103 +16,81 @@ interface StoryInfoViewProps {
 
 const StoryInfoView = ({ 
   story, 
+  purchasedChapters = [],
   onStartReading, 
-  onSelectChapter,
+  onSelectChapter, 
   onBookmark 
 }: StoryInfoViewProps) => {
   return (
-    <div className="container max-w-4xl mx-auto py-8 px-4">
-      <Button variant="ghost" asChild className="mb-6">
-        <Link to="/search">
-          <ChevronLeft className="mr-2 h-4 w-4" />
-          Kembali ke pencarian
-        </Link>
-      </Button>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-1">
-          <div className="relative aspect-[2/3] overflow-hidden rounded-lg border border-border">
-            <img 
-              src={story.cover} 
-              alt={story.title} 
-              className="object-cover w-full h-full" 
-            />
-          </div>
-          <div className="flex gap-2 mt-4">
-            <Button onClick={onBookmark} variant="outline" className="flex-1">
-              <BookmarkPlus className="mr-2 h-4 w-4" />
-              Simpan
-            </Button>
-            <Button 
-              onClick={onStartReading} 
-              className="flex-1 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"
-            >
-              <BookOpen className="mr-2 h-4 w-4" />
-              Baca
-            </Button>
-          </div>
+    <div className="container max-w-4xl mx-auto py-8 px-4 space-y-8">
+      <div className="flex flex-col md:flex-row gap-6">
+        <div className="w-full md:w-1/3 flex-shrink-0">
+          <img 
+            src={story.cover} 
+            alt={story.title}
+            className="w-full h-auto object-cover rounded-xl shadow-md"
+          />
         </div>
-
-        <div className="md:col-span-2 space-y-4">
+        
+        <div className="flex-1 space-y-4">
           <h1 className="text-3xl font-bold">{story.title}</h1>
+          <p className="text-lg font-medium">{story.author}</p>
           
-          <div className="flex items-center gap-2">
-            <Avatar className="h-8 w-8">
-              <AvatarImage src={`https://api.dicebear.com/7.x/micah/svg?seed=${story.author}`} />
-              <AvatarFallback>{story.author.charAt(0)}</AvatarFallback>
-            </Avatar>
-            <span className="text-sm font-medium">{story.author}</span>
-          </div>
-          
-          <div className="flex gap-3 text-sm text-muted-foreground">
+          <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
             <div className="flex items-center gap-1">
-              <Calendar size={16} />
-              <span>{new Date(story.datePublished).toLocaleDateString('id-ID', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-              })}</span>
+              <Eye className="h-4 w-4" />
+              <span>{story.views || 0} views</span>
             </div>
-            
-            {story.views && (
-              <div className="flex items-center gap-1">
-                <Eye size={16} />
-                <span>{story.views.toLocaleString()}</span>
-              </div>
-            )}
-            
-            {story.likes && (
-              <div className="flex items-center gap-1">
-                <Heart size={16} />
-                <span>{story.likes.toLocaleString()}</span>
-              </div>
-            )}
+            <div className="flex items-center gap-1">
+              <Heart className="h-4 w-4" />
+              <span>{story.likes || 0} likes</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Calendar className="h-4 w-4" />
+              <span>{story.datePublished}</span>
+            </div>
           </div>
           
           <div className="flex flex-wrap gap-2">
-            <Badge variant="secondary">{story.genre}</Badge>
-            {story.tags.map(tag => (
-              <Badge key={tag} variant="outline">{tag}</Badge>
+            <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm">
+              {story.genre}
+            </span>
+            {story.tags?.map((tag) => (
+              <span 
+                key={tag} 
+                className="px-3 py-1 bg-secondary text-secondary-foreground rounded-full text-sm"
+              >
+                {tag}
+              </span>
             ))}
           </div>
           
-          <Separator />
+          <p className="text-muted-foreground">
+            {story.synopsis}
+          </p>
           
-          <div>
-            <h3 className="font-semibold mb-2">Sinopsis</h3>
-            <p className="text-muted-foreground">{story.synopsis}</p>
-          </div>
-          
-          <Separator />
-          
-          <div>
-            <h3 className="font-semibold mb-2">Daftar Bab ({story.chapters.length})</h3>
-            <ChaptersList 
-              chapters={story.chapters} 
-              onSelectChapter={onSelectChapter}
-            />
+          <div className="flex gap-3 pt-4">
+            <Button onClick={onStartReading}>
+              <Play className="mr-2 h-4 w-4" />
+              Mulai Membaca
+            </Button>
+            <Button variant="outline" onClick={onBookmark}>
+              <Bookmark className="mr-2 h-4 w-4" />
+              Simpan
+            </Button>
           </div>
         </div>
+      </div>
+      
+      <Separator className="my-8" />
+      
+      <div>
+        <h2 className="text-2xl font-semibold mb-4">Daftar Chapter</h2>
+        <ChaptersList 
+          chapters={story.chapters} 
+          purchasedChapters={purchasedChapters}
+          onSelectChapter={onSelectChapter} 
+        />
       </div>
     </div>
   );

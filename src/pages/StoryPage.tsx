@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { stories } from '@/data/stories';
 import { Story } from '@/types/story';
@@ -46,6 +46,7 @@ const StoryPage = () => {
 
   const currentChapter = story.chapters[currentChapterIndex];
   const isChapterPurchased = purchasedChapters.some(pc => pc.chapter_id === currentChapter.id);
+  const isPremiumLocked = currentChapter.isPremium && !isChapterPurchased;
 
   const navigateChapter = (direction: 'next' | 'prev') => {
     if (direction === 'next' && currentChapterIndex < story.chapters.length - 1) {
@@ -84,13 +85,18 @@ const StoryPage = () => {
       return;
     }
 
-    await purchaseChapter(
+    const success = await purchaseChapter(
       user,
       profile.coins,
       currentChapter.id,
       story.id,
       chapterPrice
     );
+    
+    if (success) {
+      // Force UI update after successful purchase
+      setIsReading(true);
+    }
   };
 
   const handleBookmark = () => {
@@ -113,7 +119,7 @@ const StoryPage = () => {
             currentChapter={currentChapter}
             currentChapterIndex={currentChapterIndex}
             totalChapters={story.chapters.length}
-            isPremiumLocked={currentChapter.isPremium && !isChapterPurchased}
+            isPremiumLocked={isPremiumLocked}
             isLoggedIn={!!user}
             userCoins={profile?.coins}
             onBackClick={() => setIsReading(false)}
@@ -125,7 +131,11 @@ const StoryPage = () => {
         ) : (
           <StoryInfoView
             story={story}
-            onStartReading={() => setIsReading(true)}
+            purchasedChapters={purchasedChapters}
+            onStartReading={() => {
+              setCurrentChapterIndex(0);
+              setIsReading(true);
+            }}
             onSelectChapter={handleSelectChapter}
             onBookmark={handleBookmark}
           />
