@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { stories } from '@/data/stories';
@@ -34,7 +33,6 @@ import { toast } from '@/hooks/use-toast';
 import { Coins } from '@/components/ui/coins';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { useQuery } from '@tanstack/react-query';
 
 const StoryPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -135,7 +133,6 @@ const StoryPage = () => {
     }
 
     try {
-      // 1. Update the user's coin balance
       const { error: profileUpdateError } = await supabase
         .from('profiles')
         .update({ 
@@ -147,7 +144,6 @@ const StoryPage = () => {
         throw profileUpdateError;
       }
 
-      // 2. Record the chapter purchase
       const { error: purchaseError } = await supabase
         .from('purchased_chapters')
         .insert({
@@ -161,7 +157,6 @@ const StoryPage = () => {
         throw purchaseError;
       }
 
-      // 3. Fetch the updated purchased chapters
       const { data: updatedPurchases, error: fetchError } = await supabase
         .from('purchased_chapters')
         .select('*')
@@ -174,9 +169,7 @@ const StoryPage = () => {
 
       setPurchasedChapters(updatedPurchases || []);
 
-      // 4. Update profile in the auth context
       if (typeof profile.coins === 'number') {
-        // Update the local profile state (will be fetched from the server automatically)
         toast({
           title: "Pembelian Berhasil",
           description: `Anda telah membeli chapter premium dengan ${chapterPrice} koin.`,

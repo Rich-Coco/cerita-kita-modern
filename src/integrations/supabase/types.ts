@@ -83,6 +83,36 @@ export type Database = {
         }
         Relationships: []
       }
+      purchased_chapters: {
+        Row: {
+          chapter_id: string
+          id: string
+          price_paid: number
+          purchased_at: string
+          story_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          chapter_id: string
+          id?: string
+          price_paid: number
+          purchased_at?: string
+          story_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          chapter_id?: string
+          id?: string
+          price_paid?: number
+          purchased_at?: string
+          story_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       stories: {
         Row: {
           author_id: string
