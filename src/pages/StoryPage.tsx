@@ -1,8 +1,8 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { stories } from '@/data/stories';
-import { Story, Chapter } from '@/types/story';
+import { Story, Chapter, PurchasedChapter } from '@/types/story';
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -34,14 +34,52 @@ import { toast } from '@/hooks/use-toast';
 import { Coins } from '@/components/ui/coins';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
 
 const StoryPage = () => {
   const { id } = useParams<{ id: string }>();
   const [currentChapterIndex, setCurrentChapterIndex] = useState(0);
   const [isReading, setIsReading] = useState(false);
   const { user, profile } = useAuth();
+  const [purchasedChapters, setPurchasedChapters] = useState<PurchasedChapter[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const story = stories.find(s => s.id === id);
+
+  useEffect(() => {
+    const fetchPurchasedChapters = async () => {
+      if (!user) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('purchased_chapters')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('story_id', id);
+
+        if (error) {
+          console.error('Error fetching purchased chapters:', error);
+          toast({
+            title: "Gagal mengambil data chapter",
+            description: error.message,
+            variant: "destructive",
+          });
+        } else {
+          setPurchasedChapters(data || []);
+          console.log('Purchased chapters:', data);
+        }
+      } catch (err) {
+        console.error('Error in purchased chapters fetch:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPurchasedChapters();
+  }, [user, id]);
 
   if (!story) {
     return (
@@ -63,6 +101,7 @@ const StoryPage = () => {
   }
 
   const currentChapter = story.chapters[currentChapterIndex];
+  const isChapterPurchased = purchasedChapters.some(pc => pc.chapter_id === currentChapter.id);
 
   const navigateChapter = (direction: 'next' | 'prev') => {
     if (direction === 'next' && currentChapterIndex < story.chapters.length - 1) {
@@ -95,13 +134,63 @@ const StoryPage = () => {
       return;
     }
 
-    // Here we would typically make a call to the backend to process the purchase
-    // For now, we'll just show a success message
-    toast({
-      title: "Pembelian Berhasil",
-      description: `Anda telah membeli chapter premium dengan ${chapterPrice} koin.`,
-      variant: "default",
-    });
+    try {
+      // 1. Update the user's coin balance
+      const { error: profileUpdateError } = await supabase
+        .from('profiles')
+        .update({ 
+          coins: profile.coins - chapterPrice 
+        })
+        .eq('id', user.id);
+
+      if (profileUpdateError) {
+        throw profileUpdateError;
+      }
+
+      // 2. Record the chapter purchase
+      const { error: purchaseError } = await supabase
+        .from('purchased_chapters')
+        .insert({
+          user_id: user.id,
+          chapter_id: currentChapter.id,
+          story_id: story.id,
+          price_paid: chapterPrice
+        });
+
+      if (purchaseError) {
+        throw purchaseError;
+      }
+
+      // 3. Fetch the updated purchased chapters
+      const { data: updatedPurchases, error: fetchError } = await supabase
+        .from('purchased_chapters')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('story_id', id);
+
+      if (fetchError) {
+        throw fetchError;
+      }
+
+      setPurchasedChapters(updatedPurchases || []);
+
+      // 4. Update profile in the auth context
+      if (typeof profile.coins === 'number') {
+        // Update the local profile state (will be fetched from the server automatically)
+        toast({
+          title: "Pembelian Berhasil",
+          description: `Anda telah membeli chapter premium dengan ${chapterPrice} koin.`,
+          variant: "default",
+        });
+      }
+    } catch (error: any) {
+      console.error('Error purchasing chapter:', error);
+      toast({
+        title: "Gagal Membeli Chapter",
+        description: error.message || "Terjadi kesalahan saat membeli chapter.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleBookmark = () => {
@@ -235,7 +324,7 @@ const StoryPage = () => {
   );
 
   const ReadingView = () => {
-    const isPremiumLocked = currentChapter.isPremium;
+    const isPremiumLocked = currentChapter.isPremium && !isChapterPurchased;
     const chapterPrice = currentChapter.coinPrice || 1;
     
     return (
@@ -413,7 +502,13 @@ const StoryPage = () => {
 
   return (
     <MainLayout>
-      {isReading ? <ReadingView /> : <StoryInfoView />}
+      {isLoading ? (
+        <div className="flex justify-center items-center min-h-[50vh]">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        </div>
+      ) : (
+        isReading ? <ReadingView /> : <StoryInfoView />
+      )}
     </MainLayout>
   );
 };

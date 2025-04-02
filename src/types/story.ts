@@ -34,3 +34,12 @@ export interface StoryFormData {
     coinPrice?: number;
   }[];
 }
+
+export interface PurchasedChapter {
+  id: string;
+  user_id: string;
+  chapter_id: string;
+  story_id: string;
+  purchased_at: string;
+  price_paid: number;
+}
