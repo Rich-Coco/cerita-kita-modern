@@ -12,12 +12,12 @@ import MainLayout from '@/components/layout/MainLayout';
 const genres = [
   { 
     title: 'Fiksi Fantasi', 
-    image: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1469', 
+    image: 'https://images.unsplash.com/photo-1514539079130-25950c84af65?q=80&w=1469', 
     count: 84 
   },
   { 
     title: 'Romance', 
-    image: 'https://images.unsplash.com/photo-1532377394423-f5e9d3a186c3?q=80&w=1510', 
+    image: 'https://images.unsplash.com/photo-1518621736915-f3b1c41bfd00?q=80&w=1506', 
     count: 125 
   },
   { 
@@ -27,17 +27,17 @@ const genres = [
   },
   { 
     title: 'Misteri', 
-    image: 'https://images.unsplash.com/photo-1504194104404-433180773017?q=80&w=1470', 
+    image: 'https://images.unsplash.com/photo-1603513492128-ba7bc9b3e143?q=80&w=1469', 
     count: 73 
   },
   { 
     title: 'Horor', 
-    image: 'https://images.unsplash.com/photo-1555354921-a3fb5af006ff?q=80&w=1470', 
+    image: 'https://images.unsplash.com/photo-1535083783855-76ae62b2914e?q=80&w=1470', 
     count: 48 
   },
   { 
     title: 'Petualangan', 
-    image: 'https://images.unsplash.com/photo-1485470733090-0aae1788d5af?q=80&w=1517', 
+    image: 'https://images.unsplash.com/photo-1528543606781-2f6e6857f318?q=80&w=1470', 
     count: 91 
   },
 ];
