@@ -161,7 +161,7 @@ Koin berlaku selamanya tanpa batasan waktu.</p>
           <div className="flex justify-between items-center mb-4">
             <TabsList>
               <TabsTrigger value="packages">Paket Koin</TabsTrigger>
-              <TabsTrigger value="history">Riwayat Transaksi</TabsTrigger>
+              
             </TabsList>
             
             <Button variant="outline" size="sm" onClick={() => navigate(-1)}>
