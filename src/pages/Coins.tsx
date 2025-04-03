@@ -11,6 +11,7 @@ import { PackageType } from '@/types/payment';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+
 const coinPackages: PackageType[] = [{
   id: 'basic',
   name: 'Paket Dasar',
@@ -19,7 +20,7 @@ const coinPackages: PackageType[] = [{
   priceValue: 10000,
   features: ['Akses ke 1-10 chapter premium', 'Berlaku selamanya', 'Tidak ada batasan waktu'],
   popular: false,
-  paymentLink: 'https://app.sandbox.midtrans.com/payment-links/1743586146943'
+  paymentLink: 'https://app.midtrans.com/payment-links/1743663616326'
 }, {
   id: 'premium',
   name: 'Paket Premium',
@@ -37,6 +38,7 @@ const coinPackages: PackageType[] = [{
   features: ['Akses ke 20-50 chapter premium', 'Diskon 30% dari harga per koin', 'Hadiah bonus badge profil eksklusif', 'Fitur highlight komentar', 'Berlaku selamanya'],
   popular: false
 }];
+
 const CoinsPage = () => {
   const {
     user,
@@ -44,6 +46,7 @@ const CoinsPage = () => {
   } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('packages');
+
   useEffect(() => {
     const handleDirectPaymentCallback = async () => {
       if (!user) return;
@@ -98,12 +101,15 @@ const CoinsPage = () => {
     };
     handleDirectPaymentCallback();
   }, [user]);
+
   const handlePaymentSuccess = () => {
     window.location.reload();
   };
+
   const handlePaymentError = (error: string) => {
     console.error('Payment error:', error);
   };
+
   const handleDirectPaymentRedirect = (paymentLink: string) => {
     try {
       console.log('Starting direct payment redirect to:', paymentLink);
@@ -132,6 +138,7 @@ const CoinsPage = () => {
       });
     }
   };
+
   return <MainLayout>
       <div className="py-8 md:py-16 max-w-7xl mx-auto px-4 md:px-6">
         <div className="max-w-3xl mx-auto text-center mb-8">
@@ -256,4 +263,5 @@ const CoinsPage = () => {
       </div>
     </MainLayout>;
 };
+
 export default CoinsPage;
