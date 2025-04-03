@@ -12,6 +12,7 @@ import { PackageType } from '@/types/payment';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { Coins } from '@/components/ui/coins';
 
 const coinPackages: PackageType[] = [{
   id: 'basic',
@@ -158,7 +159,7 @@ const CoinsPage = () => {
           
           {profile && <div className="bg-secondary/80 backdrop-blur-sm rounded-xl p-4 inline-flex items-center gap-3">
               <div className="flex items-center gap-1.5 bg-primary/10 px-3 py-1.5 rounded-lg">
-                <CoinsIcon size={18} className="text-yellow-400" />
+                <Coins size="default" />
                 <span className="font-bold">{profile.coins || 0}</span>
               </div>
               <span>Koin tersedia saat ini</span>
@@ -168,8 +169,8 @@ const CoinsPage = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="max-w-5xl mx-auto">
           <div className="flex justify-between items-center mb-4">
             <TabsList>
-              
-              
+              <TabsTrigger value="packages">Paket Koin</TabsTrigger>
+              <TabsTrigger value="history">Riwayat Transaksi</TabsTrigger>
             </TabsList>
             
             <Button variant="outline" size="sm" onClick={() => navigate(-1)}>
@@ -182,6 +183,7 @@ const CoinsPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {coinPackages.map(pkg => <Card key={pkg.id} className={`relative overflow-hidden backdrop-blur-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${pkg.popular ? 'border-primary bg-card/95 shadow-lg' : 'bg-card/60'}`}>
                   {pkg.popular && <div className="absolute -top-4 -right-12 rotate-45 bg-primary px-12 py-1 text-xs font-medium text-primary-foreground">
+                    Terpopuler
                   </div>}
                   
                   <CardHeader className="text-center pb-2">
@@ -204,11 +206,23 @@ const CoinsPage = () => {
                       
                       <div className="mt-1 text-2xl font-bold">{pkg.price}</div>
                       
+                      <ul className="mt-4 space-y-2 text-sm">
+                        {pkg.features.map((feature, i) => (
+                          <li key={i} className="flex items-start">
+                            <Check size={16} className="text-green-500 mr-2 mt-0.5 shrink-0" />
+                            <span>{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   </CardContent>
                   
                   <CardFooter>
-                    {pkg.id === 'basic' && pkg.paymentLink ? <Button onClick={() => handleDirectPaymentRedirect(pkg.paymentLink!)} className="w-full" variant="outline">
+                    {pkg.paymentLink ? <Button 
+                        onClick={() => handleDirectPaymentRedirect(pkg.paymentLink!)} 
+                        className="w-full" 
+                        variant={pkg.popular ? 'default' : 'outline'}
+                      >
                         <CreditCard size={16} className="mr-2" />
                         Beli Sekarang
                       </Button> : <MidtransPayment packageData={pkg} onSuccess={handlePaymentSuccess} onError={handlePaymentError} />}
