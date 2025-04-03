@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,7 +12,6 @@ import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Coins } from '@/components/ui/coins';
-
 const coinPackages: PackageType[] = [{
   id: 'basic',
   name: 'Paket Dasar',
@@ -42,7 +40,6 @@ const coinPackages: PackageType[] = [{
   popular: false,
   paymentLink: 'https://app.midtrans.com/payment-links/1743663886817'
 }];
-
 const CoinsPage = () => {
   const {
     user,
@@ -50,7 +47,6 @@ const CoinsPage = () => {
   } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('packages');
-
   useEffect(() => {
     const handleDirectPaymentCallback = async () => {
       if (!user) return;
@@ -105,15 +101,12 @@ const CoinsPage = () => {
     };
     handleDirectPaymentCallback();
   }, [user]);
-
   const handlePaymentSuccess = () => {
     window.location.reload();
   };
-
   const handlePaymentError = (error: string) => {
     console.error('Payment error:', error);
   };
-
   const handleDirectPaymentRedirect = (paymentLink: string) => {
     try {
       console.log('Starting direct payment redirect to:', paymentLink);
@@ -142,7 +135,6 @@ const CoinsPage = () => {
       });
     }
   };
-
   return <MainLayout>
       <div className="py-8 md:py-16 max-w-7xl mx-auto px-4 md:px-6">
         <div className="max-w-3xl mx-auto text-center mb-8">
@@ -183,8 +175,7 @@ const CoinsPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {coinPackages.map(pkg => <Card key={pkg.id} className={`relative overflow-hidden backdrop-blur-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${pkg.popular ? 'border-primary bg-card/95 shadow-lg' : 'bg-card/60'}`}>
                   {pkg.popular && <div className="absolute -top-4 -right-12 rotate-45 bg-primary px-12 py-1 text-xs font-medium text-primary-foreground">
-                    Terpopuler
-                  </div>}
+              </div>}
                   
                   <CardHeader className="text-center pb-2">
                     <CardTitle className="text-xl">{pkg.name}</CardTitle>
@@ -206,23 +197,12 @@ const CoinsPage = () => {
                       
                       <div className="mt-1 text-2xl font-bold">{pkg.price}</div>
                       
-                      <ul className="mt-4 space-y-2 text-sm">
-                        {pkg.features.map((feature, i) => (
-                          <li key={i} className="flex items-start">
-                            <Check size={16} className="text-green-500 mr-2 mt-0.5 shrink-0" />
-                            <span>{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
+                      
                     </div>
                   </CardContent>
                   
                   <CardFooter>
-                    {pkg.paymentLink ? <Button 
-                        onClick={() => handleDirectPaymentRedirect(pkg.paymentLink!)} 
-                        className="w-full" 
-                        variant={pkg.popular ? 'default' : 'outline'}
-                      >
+                    {pkg.paymentLink ? <Button onClick={() => handleDirectPaymentRedirect(pkg.paymentLink!)} className="w-full" variant={pkg.popular ? 'default' : 'outline'}>
                         <CreditCard size={16} className="mr-2" />
                         Beli Sekarang
                       </Button> : <MidtransPayment packageData={pkg} onSuccess={handlePaymentSuccess} onError={handlePaymentError} />}
@@ -280,5 +260,4 @@ const CoinsPage = () => {
       </div>
     </MainLayout>;
 };
-
 export default CoinsPage;
