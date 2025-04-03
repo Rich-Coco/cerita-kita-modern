@@ -145,9 +145,8 @@ const CoinsPage = () => {
             </span>
           </h1>
           
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto mb-6">
-            Dapatkan akses ke cerita dan chapter premium dari penulis favorit anda. Koin berlaku selamanya tanpa batasan waktu.
-          </p>
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto mb-6">Dapatkan akses ke cerita dan chapter premium dari penulis favorit anda. 
+Koin berlaku selamanya tanpa batasan waktu.</p>
           
           {profile && <div className="bg-secondary/80 backdrop-blur-sm rounded-xl p-4 inline-flex items-center gap-3">
               <div className="flex items-center gap-1.5 bg-primary/10 px-3 py-1.5 rounded-lg">
