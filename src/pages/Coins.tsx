@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -28,7 +29,8 @@ const coinPackages: PackageType[] = [{
   price: 'Rp 30.000',
   priceValue: 30000,
   features: ['Akses ke 10-30 chapter premium', 'Diskon 15% dari harga per koin', 'Hadiah bonus badge profil', 'Berlaku selamanya'],
-  popular: true
+  popular: true,
+  paymentLink: 'https://app.midtrans.com/payment-links/1743663811172'
 }, {
   id: 'ultimate',
   name: 'Paket Ultimate',
