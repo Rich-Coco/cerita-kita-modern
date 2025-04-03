@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -22,7 +23,7 @@ const NavItem = ({
 }: NavItemProps) => {
   return <Link to={to} className={cn("flex items-center gap-2 px-4 py-2 rounded-md transition-all duration-300", isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-secondary")}>
       {icon}
-      <span className="hidden md:inline">{label}</span>
+      <span className="md:inline">{label}</span>
     </Link>;
 };
 
