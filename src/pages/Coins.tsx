@@ -38,7 +38,8 @@ const coinPackages: PackageType[] = [{
   price: 'Rp 50.000',
   priceValue: 50000,
   features: ['Akses ke 20-50 chapter premium', 'Diskon 30% dari harga per koin', 'Hadiah bonus badge profil eksklusif', 'Fitur highlight komentar', 'Berlaku selamanya'],
-  popular: false
+  popular: false,
+  paymentLink: 'https://app.midtrans.com/payment-links/1743663886817'
 }];
 
 const CoinsPage = () => {
