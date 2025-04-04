@@ -9,10 +9,12 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/components/ui/use-toast';
-import { Plus, X, Upload, Check, FileText, ChevronRight } from 'lucide-react';
-import { StoryFormData, Story } from '@/types/story';
-import { stories } from '@/data/stories';
+import { Plus, X, Upload, Check, FileText, ChevronRight, Loader2 } from 'lucide-react';
+import { StoryFormData } from '@/types/story';
 import MainLayout from '@/components/layout/MainLayout';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+import { v4 as uuidv4 } from 'uuid';
 
 const genres = [
   'Fiksi Fantasi',
@@ -54,10 +56,12 @@ const initialFormData: StoryFormData = {
 
 const Publish = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [formData, setFormData] = useState<StoryFormData>(initialFormData);
   const [currentTab, setCurrentTab] = useState('info');
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const [tagInput, setTagInput] = useState('');
+  const [isPublishing, setIsPublishing] = useState(false);
   
   const [chapterTitle, setChapterTitle] = useState('');
   const [chapterContent, setChapterContent] = useState('');
@@ -197,7 +201,44 @@ const Publish = () => {
     }
   };
   
-  const handlePublish = () => {
+  const uploadCoverImage = async (file: File) => {
+    if (!user) return null;
+    
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${uuidv4()}.${fileExt}`;
+    const filePath = `story-covers/${fileName}`;
+    
+    try {
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('stories')
+        .upload(filePath, file);
+        
+      if (uploadError) {
+        console.error('Error uploading cover:', uploadError);
+        return null;
+      }
+      
+      const { data: urlData } = supabase.storage
+        .from('stories')
+        .getPublicUrl(filePath);
+        
+      return urlData.publicUrl;
+    } catch (error) {
+      console.error('Error in cover upload:', error);
+      return null;
+    }
+  };
+  
+  const handlePublish = async () => {
+    if (!user) {
+      toast({
+        title: "Login Required",
+        description: "Please login to publish a story",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     if (formData.chapters.length === 0) {
       toast({
         title: "Tidak Dapat Menerbitkan",
@@ -207,38 +248,71 @@ const Publish = () => {
       return;
     }
     
-    const newStory: Story = {
-      id: `${stories.length + 1}`,
-      title: formData.title,
-      cover: coverPreview || 'https://images.unsplash.com/photo-1532012197267-da84d127e765?q=80&w=2070',
-      author: "Penulis Baru",
-      synopsis: formData.synopsis,
-      genre: formData.genre,
-      tags: formData.tags,
-      datePublished: new Date().toISOString().split('T')[0],
-      views: 0,
-      likes: 0,
-      chapters: formData.chapters.map((chapter, index) => ({
-        id: `${stories.length + 1}-${index + 1}`,
+    setIsPublishing(true);
+    
+    try {
+      let coverUrl = null;
+      if (formData.cover) {
+        coverUrl = await uploadCoverImage(formData.cover);
+      }
+      
+      if (!coverUrl && coverPreview) {
+        coverUrl = coverPreview;
+      }
+      
+      const { data: storyData, error: storyError } = await supabase
+        .from('stories')
+        .insert({
+          title: formData.title,
+          synopsis: formData.synopsis,
+          genre: formData.genre,
+          tags: formData.tags,
+          cover_url: coverUrl,
+          author_id: user.id,
+          is_published: true,
+        })
+        .select()
+        .single();
+        
+      if (storyError) {
+        throw storyError;
+      }
+      
+      const chaptersToInsert = formData.chapters.map((chapter, index) => ({
         title: chapter.title,
         content: chapter.content,
-        isPremium: false,
-        coinPrice: undefined,
-      })),
-    };
-    
-    stories.unshift(newStory);
-    
-    console.log('Publishing story:', newStory);
-    
-    toast({
-      title: "Cerita Berhasil Diterbitkan!",
-      description: "Cerita anda telah berhasil diterbitkan dan kini tersedia untuk dibaca.",
-    });
-    
-    setTimeout(() => {
-      navigate('/search');
-    }, 1500);
+        story_id: storyData.id,
+        chapter_number: index + 1,
+        is_premium: false,
+      }));
+      
+      const { error: chaptersError } = await supabase
+        .from('chapters')
+        .insert(chaptersToInsert);
+        
+      if (chaptersError) {
+        throw chaptersError;
+      }
+      
+      toast({
+        title: "Cerita Berhasil Diterbitkan!",
+        description: "Cerita anda telah berhasil diterbitkan dan kini tersedia untuk dibaca.",
+      });
+      
+      setTimeout(() => {
+        navigate('/profile');
+      }, 1500);
+      
+    } catch (error) {
+      console.error('Error publishing story:', error);
+      toast({
+        title: "Failed to publish",
+        description: "An error occurred while publishing your story.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsPublishing(false);
+    }
   };
   
   return (
@@ -677,8 +751,19 @@ const Publish = () => {
                         Kembali
                       </Button>
                       
-                      <Button onClick={handlePublish} size="lg">
-                        Terbitkan Cerita
+                      <Button 
+                        onClick={handlePublish} 
+                        size="lg"
+                        disabled={isPublishing}
+                      >
+                        {isPublishing ? (
+                          <>
+                            <Loader2 size={16} className="mr-2 animate-spin" />
+                            Publishing...
+                          </>
+                        ) : (
+                          'Terbitkan Cerita'
+                        )}
                       </Button>
                     </div>
                   </div>

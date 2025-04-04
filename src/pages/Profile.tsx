@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -54,13 +53,15 @@ const Profile = () => {
         const { data, error } = await supabase
           .from('stories')
           .select('*')
-          .eq('author_id', user.id);
+          .eq('author_id', user.id)
+          .order('created_at', { ascending: false });
           
         if (error) {
           console.error('Error fetching user stories:', error);
           return;
         }
         
+        console.log('Fetched user stories:', data);
         setUserStories(data || []);
       } catch (error) {
         console.error('Error in fetchUserStories:', error);
