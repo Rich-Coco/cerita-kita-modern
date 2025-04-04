@@ -20,15 +20,10 @@ const ChapterContent = ({
   chapterPrice,
   onPurchaseChapter
 }: ChapterContentProps) => {
-  const hasEnoughCoins = userCoins !== undefined && userCoins >= chapterPrice;
-  
   if (isPremiumLocked) {
     return (
       <PremiumContentLock
         isUserLoggedIn={isUserLoggedIn}
-        hasEnoughCoins={hasEnoughCoins}
-        userCoins={userCoins}
-        chapterPrice={chapterPrice}
         onPurchase={onPurchaseChapter}
       />
     );
