@@ -16,12 +16,15 @@ import { format } from 'date-fns';
 import { uploadAvatar } from '@/utils/storage';
 import { Coins as CoinsDisplay } from '@/components/ui/coins';
 import { stories } from '@/data/stories';
-
 const Profile = () => {
   const [profileTab, setProfileTab] = useState('stories');
   const [isEditing, setIsEditing] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const { user, profile, updateProfile } = useAuth();
+  const {
+    user,
+    profile,
+    updateProfile
+  } = useAuth();
   const [userData, setUserData] = useState({
     name: '',
     username: '',
@@ -31,11 +34,9 @@ const Profile = () => {
     coins: 0,
     joined: ''
   });
-
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [avatarKey, setAvatarKey] = useState(Date.now());
-
   useEffect(() => {
     if (profile) {
       console.log('Setting user data from profile:', profile);
@@ -51,8 +52,7 @@ const Profile = () => {
       setAvatarKey(Date.now());
     }
   }, [profile, user]);
-
-  const formatDate = (dateString) => {
+  const formatDate = dateString => {
     if (!dateString) return '';
     try {
       return format(new Date(dateString), 'MMMM yyyy');
@@ -61,7 +61,6 @@ const Profile = () => {
       return '';
     }
   };
-
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -74,14 +73,11 @@ const Profile = () => {
       reader.readAsDataURL(file);
     }
   };
-
-  const handleProfileUpdate = async (e) => {
+  const handleProfileUpdate = async e => {
     e.preventDefault();
-    
     try {
       setIsUploading(true);
       let avatarUrl = userData.avatar;
-      
       if (avatarFile) {
         console.log('Uploading avatar file...');
         const newAvatarUrl = await uploadAvatar(avatarFile, user.id);
@@ -97,23 +93,20 @@ const Profile = () => {
           });
         }
       }
-      
       const updatedProfile = {
         full_name: userData.name,
         username: userData.username,
         bio: userData.bio,
-        avatar_url: avatarUrl,
+        avatar_url: avatarUrl
       };
-      
       console.log('Updating profile with:', updatedProfile);
       await updateProfile(updatedProfile);
-      
+
       // Update avatar key to force refresh
       setAvatarKey(Date.now());
       setIsEditing(false);
       setAvatarFile(null);
       setAvatarPreview(null);
-      
       toast({
         title: "Profil diperbarui",
         description: "Informasi profil Anda berhasil disimpan"
@@ -129,12 +122,10 @@ const Profile = () => {
       setIsUploading(false);
     }
   };
-
   const handleCancelEdit = () => {
     setIsEditing(false);
     setAvatarFile(null);
     setAvatarPreview(null);
-    
     if (profile) {
       setUserData({
         name: profile.full_name || '',
@@ -147,9 +138,7 @@ const Profile = () => {
       });
     }
   };
-
-  return (
-    <MainLayout>
+  return <MainLayout>
       <div className="py-8 md:py-12 max-w-7xl mx-auto px-4 md:px-6">
         <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-8">
           <div className="space-y-6">
@@ -159,11 +148,7 @@ const Profile = () => {
               <CardContent className="pt-0">
                 <div className="flex flex-col items-center -mt-12">
                   <Avatar className="h-24 w-24 border-4 border-background">
-                    <AvatarImage 
-                      src={userData.avatar} 
-                      key={avatarKey}
-                      alt={userData.name || "User avatar"} 
-                    />
+                    <AvatarImage src={userData.avatar} key={avatarKey} alt={userData.name || "User avatar"} />
                     <AvatarFallback>
                       {userData.name ? userData.name.charAt(0) + (userData.name.split(' ')[1]?.charAt(0) || '') : ''}
                     </AvatarFallback>
@@ -191,42 +176,16 @@ const Profile = () => {
             </Card>
 
             <Card>
-              <CardContent className="pt-6">
-                <div className="flex flex-col items-center text-center">
-                  <div className="h-12 w-12 bg-yellow-100 rounded-full flex items-center justify-center mb-3">
-                    <Wallet className="h-6 w-6 text-yellow-600" />
-                  </div>
-                  <h3 className="font-medium text-lg mb-1">Wallet Anda</h3>
-                  
-                  <div className="flex items-center gap-2 text-2xl font-bold mt-2">
-                    <CoinsDisplay size="lg" />
-                    <span>{userData.coins}</span>
-                  </div>
-                  
-                  <p className="text-sm text-muted-foreground mt-1 mb-4">
-                    Koin dapat digunakan untuk membuka konten premium
-                  </p>
-                  
-                  <Button asChild variant="default" className="w-full">
-                    <Link to="/coins">
-                      <Coins size={16} className="mr-2" />
-                      Beli Koin
-                    </Link>
-                  </Button>
-                </div>
-              </CardContent>
+              
             </Card>
             
             <div className="grid grid-cols-2 gap-2">
               <Button asChild variant="outline" className="w-full">
-                <Link to="/coins">
-                  <Coins size={16} className="mr-2 text-yellow-400" />
-                  Beli Koin
-                </Link>
+                
               </Button>
               
               <Button asChild variant="outline" className="w-full">
-                <Link to="/publish">
+                <Link to="/publish" className="px-0">
                   <Pencil size={16} className="mr-2" />
                   Tulis Cerita
                 </Link>
@@ -316,23 +275,13 @@ const Profile = () => {
                       <div className="flex justify-center mb-4">
                         <div className="relative">
                           <Avatar className="h-24 w-24 border-2 border-primary">
-                            <AvatarImage 
-                              src={avatarPreview || userData.avatar} 
-                              key={avatarKey}
-                              alt={userData.name || "User avatar"} 
-                            />
+                            <AvatarImage src={avatarPreview || userData.avatar} key={avatarKey} alt={userData.name || "User avatar"} />
                             <AvatarFallback>{userData.name.charAt(0)}{userData.name.split(' ')[1]?.charAt(0) || ''}</AvatarFallback>
                           </Avatar>
                           
                           <Label htmlFor="avatar-upload" className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full bg-primary text-white flex items-center justify-center cursor-pointer hover:bg-primary/90 transition-colors">
                             <Upload size={14} />
-                            <Input 
-                              id="avatar-upload" 
-                              type="file"
-                              accept="image/*"
-                              className="hidden"
-                              onChange={handleAvatarChange}
-                            />
+                            <Input id="avatar-upload" type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
                           </Label>
                         </div>
                       </div>
@@ -369,17 +318,13 @@ const Profile = () => {
                         </Button>
                         
                         <Button type="submit" disabled={isUploading}>
-                          {isUploading ? (
-                            <>
+                          {isUploading ? <>
                               <Loader2 size={16} className="mr-2 animate-spin" />
                               Uploading...
-                            </>
-                          ) : (
-                            <>
+                            </> : <>
                               <Save size={16} className="mr-2" />
                               Simpan Perubahan
-                            </>
-                          )}
+                            </>}
                         </Button>
                       </div>
                     </form> : <div className="space-y-6">
@@ -415,8 +360,6 @@ const Profile = () => {
           </div>
         </div>
       </div>
-    </MainLayout>
-  );
+    </MainLayout>;
 };
-
 export default Profile;
