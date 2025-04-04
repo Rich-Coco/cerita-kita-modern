@@ -198,6 +198,42 @@ const Profile = () => {
     navigate('/publish');
   };
   
+  // Refetch stories when the profile tab is changed to stories
+  useEffect(() => {
+    if (profileTab === 'stories' && user) {
+      const fetchUserStories = async () => {
+        try {
+          setIsLoadingStories(true);
+          console.log('Refetching stories for user ID:', user.id);
+          
+          const { data, error } = await supabase
+            .from('stories')
+            .select('*')
+            .eq('author_id', user.id);
+            
+          if (error) {
+            console.error('Error fetching user stories:', error);
+            toast({
+              title: "Error",
+              description: "Failed to load your stories. Please try again.",
+              variant: "destructive"
+            });
+            return;
+          }
+          
+          console.log('Refetched user stories:', data);
+          setUserStories(data || []);
+        } catch (error) {
+          console.error('Error in fetchUserStories:', error);
+        } finally {
+          setIsLoadingStories(false);
+        }
+      };
+      
+      fetchUserStories();
+    }
+  }, [profileTab, user]);
+  
   return <MainLayout>
       <div className="py-8 md:py-12 max-w-7xl mx-auto px-4 md:px-6">
         <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-8">
