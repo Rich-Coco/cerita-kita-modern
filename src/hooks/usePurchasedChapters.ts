@@ -47,37 +47,22 @@ export const usePurchasedChapters = (userId: string | undefined, storyId: string
 
   const purchaseChapter = async (
     user: User, 
-    userCoins: number, 
     chapterId: string, 
-    storyId: string, 
-    chapterPrice: number
+    storyId: string
   ) => {
     console.log('Purchase chapter with params:', {
       userId: user.id,
       chapterId,
-      storyId,
-      price: chapterPrice
+      storyId
     });
 
     try {
-      // First update the user's coins
-      const { error: profileUpdateError } = await supabase
-        .from('profiles')
-        .update({ 
-          coins: userCoins - chapterPrice 
-        })
-        .eq('id', user.id);
-
-      if (profileUpdateError) {
-        throw profileUpdateError;
-      }
-
       // Insert the purchase record
       const purchaseData = {
         user_id: user.id,
         chapter_id: chapterId,
         story_id: storyId,
-        price_paid: chapterPrice
+        price_paid: 0 // Free access
       };
       
       console.log('Inserting purchase record:', purchaseData);
@@ -106,8 +91,8 @@ export const usePurchasedChapters = (userId: string | undefined, storyId: string
       setPurchasedChapters(typedData || []);
 
       toast({
-        title: "Pembelian Berhasil",
-        description: `Anda telah membeli chapter premium dengan ${chapterPrice} koin.`,
+        title: "Akses Diberikan",
+        description: "Anda telah diberikan akses ke chapter premium.",
         variant: "default",
       });
       
@@ -115,8 +100,8 @@ export const usePurchasedChapters = (userId: string | undefined, storyId: string
     } catch (error: any) {
       console.error('Error purchasing chapter:', error);
       toast({
-        title: "Gagal Membeli Chapter",
-        description: error.message || "Terjadi kesalahan saat membeli chapter.",
+        title: "Gagal Mengakses Chapter",
+        description: error.message || "Terjadi kesalahan saat mengakses chapter.",
         variant: "destructive",
       });
       return false;
