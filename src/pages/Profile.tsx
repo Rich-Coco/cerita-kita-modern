@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -45,48 +44,55 @@ const Profile = () => {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [avatarKey, setAvatarKey] = useState(Date.now());
   
-  // Fetch user stories
   useEffect(() => {
-    const fetchUserStories = async () => {
-      if (!user) return;
+    if (user) {
+      fetchUserStories();
+    }
+  }, [user]);
+  
+  useEffect(() => {
+    if (profileTab === 'stories' && user) {
+      fetchUserStories();
+    }
+  }, [profileTab, user]);
+  
+  const fetchUserStories = async () => {
+    if (!user) return;
+    
+    try {
+      setIsLoadingStories(true);
       
-      try {
-        setIsLoadingStories(true);
+      console.log('Fetching stories for user ID:', user.id);
+      
+      const { data, error } = await supabase
+        .from('stories')
+        .select('*')
+        .eq('author_id', user.id);
         
-        // Log the user ID being used for fetching
-        console.log('Fetching stories for user ID:', user.id);
-        
-        const { data, error } = await supabase
-          .from('stories')
-          .select('*')
-          .eq('author_id', user.id);
-          
-        if (error) {
-          console.error('Error fetching user stories:', error);
-          toast({
-            title: "Error",
-            description: "Failed to load your stories. Please try again.",
-            variant: "destructive"
-          });
-          return;
-        }
-        
-        console.log('Fetched user stories:', data);
-        setUserStories(data || []);
-      } catch (error) {
-        console.error('Error in fetchUserStories:', error);
+      if (error) {
+        console.error('Error fetching user stories:', error);
         toast({
           title: "Error",
-          description: "An unexpected error occurred while loading your stories.",
+          description: "Failed to load your stories. Please try again.",
           variant: "destructive"
         });
-      } finally {
-        setIsLoadingStories(false);
+        return;
       }
-    };
-    
-    fetchUserStories();
-  }, [user]);
+      
+      console.log('Fetched user stories:', data);
+      
+      setUserStories(data || []);
+    } catch (error) {
+      console.error('Error in fetchUserStories:', error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred while loading your stories.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoadingStories(false);
+    }
+  };
   
   useEffect(() => {
     if (profile) {
@@ -156,7 +162,6 @@ const Profile = () => {
       console.log('Updating profile with:', updatedProfile);
       await updateProfile(updatedProfile);
 
-      // Update avatar key to force refresh
       setAvatarKey(Date.now());
       setIsEditing(false);
       setAvatarFile(null);
@@ -197,42 +202,6 @@ const Profile = () => {
   const handleWriteStory = () => {
     navigate('/publish');
   };
-  
-  // Refetch stories when the profile tab is changed to stories
-  useEffect(() => {
-    if (profileTab === 'stories' && user) {
-      const fetchUserStories = async () => {
-        try {
-          setIsLoadingStories(true);
-          console.log('Refetching stories for user ID:', user.id);
-          
-          const { data, error } = await supabase
-            .from('stories')
-            .select('*')
-            .eq('author_id', user.id);
-            
-          if (error) {
-            console.error('Error fetching user stories:', error);
-            toast({
-              title: "Error",
-              description: "Failed to load your stories. Please try again.",
-              variant: "destructive"
-            });
-            return;
-          }
-          
-          console.log('Refetched user stories:', data);
-          setUserStories(data || []);
-        } catch (error) {
-          console.error('Error in fetchUserStories:', error);
-        } finally {
-          setIsLoadingStories(false);
-        }
-      };
-      
-      fetchUserStories();
-    }
-  }, [profileTab, user]);
   
   return <MainLayout>
       <div className="py-8 md:py-12 max-w-7xl mx-auto px-4 md:px-6">

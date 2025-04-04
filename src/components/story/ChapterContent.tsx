@@ -25,6 +25,8 @@ const ChapterContent = ({
       <PremiumContentLock
         isUserLoggedIn={isUserLoggedIn}
         onPurchase={onPurchaseChapter}
+        coins={userCoins}
+        price={chapterPrice}
       />
     );
   }
