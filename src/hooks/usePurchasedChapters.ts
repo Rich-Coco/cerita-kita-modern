@@ -46,14 +46,18 @@ export const usePurchasedChapters = (userId: string | undefined, storyId: string
   }, [userId, storyId]);
 
   const purchaseChapter = async (
-    user: User, 
-    chapterId: string, 
-    storyId: string
+    user: User,
+    userCoins: number,
+    chapterId: string,
+    storyId: string,
+    chapterPrice: number
   ) => {
     console.log('Purchase chapter with params:', {
       userId: user.id,
+      userCoins,
       chapterId,
-      storyId
+      storyId,
+      chapterPrice
     });
 
     try {
@@ -62,7 +66,7 @@ export const usePurchasedChapters = (userId: string | undefined, storyId: string
         user_id: user.id,
         chapter_id: chapterId,
         story_id: storyId,
-        price_paid: 0 // Free access
+        price_paid: chapterPrice
       };
       
       console.log('Inserting purchase record:', purchaseData);

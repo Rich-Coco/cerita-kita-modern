@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Chapter, PurchasedChapter } from '@/types/story';
+import { Chapter } from '@/types/story';
 import PremiumContentLock from './PremiumContentLock';
 
 interface ChapterContentProps {
@@ -25,10 +25,10 @@ const ChapterContent = ({
   if (isPremiumLocked) {
     return (
       <PremiumContentLock
-        chapterPrice={chapterPrice}
         isUserLoggedIn={isUserLoggedIn}
         hasEnoughCoins={hasEnoughCoins}
         userCoins={userCoins}
+        chapterPrice={chapterPrice}
         onPurchase={onPurchaseChapter}
       />
     );
