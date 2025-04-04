@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -14,17 +15,21 @@ import MainLayout from '@/components/layout/MainLayout';
 import { useAuth } from '@/hooks/useAuth';
 import { format } from 'date-fns';
 import { uploadAvatar } from '@/utils/storage';
-import { Coins as CoinsDisplay } from '@/components/ui/coins';
-import { stories } from '@/data/stories';
+import { supabase } from '@/integrations/supabase/client';
+
 const Profile = () => {
   const [profileTab, setProfileTab] = useState('stories');
   const [isEditing, setIsEditing] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [userStories, setUserStories] = useState([]);
+  const [isLoadingStories, setIsLoadingStories] = useState(false);
+  
   const {
     user,
     profile,
     updateProfile
   } = useAuth();
+  
   const [userData, setUserData] = useState({
     name: '',
     username: '',
@@ -34,9 +39,39 @@ const Profile = () => {
     coins: 0,
     joined: ''
   });
+  
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [avatarKey, setAvatarKey] = useState(Date.now());
+  
+  // Fetch user stories
+  useEffect(() => {
+    const fetchUserStories = async () => {
+      if (!user) return;
+      
+      try {
+        setIsLoadingStories(true);
+        const { data, error } = await supabase
+          .from('stories')
+          .select('*')
+          .eq('author_id', user.id);
+          
+        if (error) {
+          console.error('Error fetching user stories:', error);
+          return;
+        }
+        
+        setUserStories(data || []);
+      } catch (error) {
+        console.error('Error in fetchUserStories:', error);
+      } finally {
+        setIsLoadingStories(false);
+      }
+    };
+    
+    fetchUserStories();
+  }, [user]);
+  
   useEffect(() => {
     if (profile) {
       console.log('Setting user data from profile:', profile);
@@ -52,6 +87,7 @@ const Profile = () => {
       setAvatarKey(Date.now());
     }
   }, [profile, user]);
+  
   const formatDate = dateString => {
     if (!dateString) return '';
     try {
@@ -61,6 +97,7 @@ const Profile = () => {
       return '';
     }
   };
+  
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -73,6 +110,7 @@ const Profile = () => {
       reader.readAsDataURL(file);
     }
   };
+  
   const handleProfileUpdate = async e => {
     e.preventDefault();
     try {
@@ -122,6 +160,7 @@ const Profile = () => {
       setIsUploading(false);
     }
   };
+  
   const handleCancelEdit = () => {
     setIsEditing(false);
     setAvatarFile(null);
@@ -138,6 +177,7 @@ const Profile = () => {
       });
     }
   };
+  
   return <MainLayout>
       <div className="py-8 md:py-12 max-w-7xl mx-auto px-4 md:px-6">
         <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-8">
@@ -174,16 +214,8 @@ const Profile = () => {
                 </div>
               </CardContent>
             </Card>
-
-            <Card>
-              
-            </Card>
             
-            <div className="grid grid-cols-2 gap-2">
-              <Button asChild variant="outline" className="w-full">
-                
-              </Button>
-              
+            <div className="grid grid-cols-1 gap-2">
               <Button asChild variant="outline" className="w-full">
                 <Link to="/publish" className="px-0">
                   <Pencil size={16} className="mr-2" />
@@ -218,26 +250,43 @@ const Profile = () => {
                   </Button>
                 </div>
                 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
-                  <div className="bg-secondary/40 backdrop-blur-sm rounded-lg p-4 relative overflow-hidden group">
-                    <Badge className="absolute top-2 left-2 z-10">Fiksi Fantasi</Badge>
-                    <div className="relative aspect-[3/4] rounded-md overflow-hidden mb-3">
-                      <img src={stories[0].cover} alt="Book cover" className="w-full h-full object-cover transition-transform group-hover:scale-105" />
-                    </div>
+                {isLoadingStories ? (
+                  <div className="flex justify-center items-center h-40">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
                   </div>
-                  
-                  <div className="bg-secondary/40 backdrop-blur-sm rounded-lg p-4 relative overflow-hidden group">
-                    <Badge className="absolute top-2 left-2 z-10">Techno Thriller</Badge>
-                    <div className="relative aspect-[3/4] rounded-md overflow-hidden mb-3">
-                      <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Book cover" className="w-full h-full object-cover transition-transform group-hover:scale-105" />
-                    </div>
+                ) : userStories.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
+                    {userStories.map(story => (
+                      <Link to={`/story/${story.id}`} key={story.id} className="block">
+                        <div className="bg-secondary/40 backdrop-blur-sm rounded-lg p-4 relative overflow-hidden group">
+                          <Badge className="absolute top-2 left-2 z-10">{story.genre || 'Cerita'}</Badge>
+                          <div className="relative aspect-[3/4] rounded-md overflow-hidden mb-3">
+                            <img 
+                              src={story.cover_url || 'https://images.unsplash.com/photo-1532012197267-da84d127e765?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=387&q=80'} 
+                              alt={story.title} 
+                              className="w-full h-full object-cover transition-transform group-hover:scale-105" 
+                            />
+                          </div>
+                          <h3 className="font-medium text-lg mt-2">{story.title}</h3>
+                        </div>
+                      </Link>
+                    ))}
                   </div>
-                </div>
-                
-                <div className="bg-black/80 text-white mt-6 p-4 rounded-lg text-center">
-                  <p className="text-lg font-semibold">Profil berhasil dibuat</p>
-                  <p>Selamat datang di CeritaKita!</p>
-                </div>
+                ) : (
+                  <div className="bg-secondary/40 backdrop-blur-sm rounded-lg border border-border p-8 text-center">
+                    <BookOpen size={48} className="mx-auto text-muted-foreground mb-4" />
+                    <h3 className="text-xl font-medium mb-2">Belum Ada Cerita</h3>
+                    <p className="text-muted-foreground mb-4">
+                      Anda belum membuat cerita apapun. Mulai menulis cerita pertama Anda sekarang!
+                    </p>
+                    <Button asChild>
+                      <Link to="/publish">
+                        <Pencil size={16} className="mr-2" />
+                        Tulis Cerita Pertama
+                      </Link>
+                    </Button>
+                  </div>
+                )}
               </TabsContent>
               
               <TabsContent value="bookmarks" className="mt-0">

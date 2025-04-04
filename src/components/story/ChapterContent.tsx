@@ -16,8 +16,6 @@ const ChapterContent = ({
   chapter,
   isPremiumLocked,
   isUserLoggedIn,
-  userCoins,
-  chapterPrice,
   onPurchaseChapter
 }: ChapterContentProps) => {
   if (isPremiumLocked) {
