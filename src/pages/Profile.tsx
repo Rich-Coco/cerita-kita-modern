@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -22,6 +23,7 @@ const Profile = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [userStories, setUserStories] = useState([]);
   const [isLoadingStories, setIsLoadingStories] = useState(false);
+  const navigate = useNavigate();
   
   const {
     user,
@@ -50,14 +52,22 @@ const Profile = () => {
       
       try {
         setIsLoadingStories(true);
+        
+        // Log the user ID being used for fetching
+        console.log('Fetching stories for user ID:', user.id);
+        
         const { data, error } = await supabase
           .from('stories')
           .select('*')
-          .eq('author_id', user.id)
-          .order('created_at', { ascending: false });
+          .eq('author_id', user.id);
           
         if (error) {
           console.error('Error fetching user stories:', error);
+          toast({
+            title: "Error",
+            description: "Failed to load your stories. Please try again.",
+            variant: "destructive"
+          });
           return;
         }
         
@@ -65,6 +75,11 @@ const Profile = () => {
         setUserStories(data || []);
       } catch (error) {
         console.error('Error in fetchUserStories:', error);
+        toast({
+          title: "Error",
+          description: "An unexpected error occurred while loading your stories.",
+          variant: "destructive"
+        });
       } finally {
         setIsLoadingStories(false);
       }
@@ -178,6 +193,10 @@ const Profile = () => {
       });
     }
   };
+
+  const handleWriteStory = () => {
+    navigate('/publish');
+  };
   
   return <MainLayout>
       <div className="py-8 md:py-12 max-w-7xl mx-auto px-4 md:px-6">
@@ -217,11 +236,9 @@ const Profile = () => {
             </Card>
             
             <div className="grid grid-cols-1 gap-2">
-              <Button asChild variant="outline" className="w-full">
-                <Link to="/publish" className="px-0">
-                  <Pencil size={16} className="mr-2" />
-                  Tulis Cerita
-                </Link>
+              <Button onClick={handleWriteStory} className="w-full">
+                <Pencil size={16} className="mr-2" />
+                Tulis Cerita
               </Button>
             </div>
           </div>
@@ -243,11 +260,9 @@ const Profile = () => {
               <TabsContent value="stories" className="mt-0">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-bold">Cerita Saya</h2>
-                  <Button asChild variant="outline" size="sm">
-                    <Link to="/publish">
-                      <BookOpen size={16} className="mr-2" />
-                      Tulis Cerita Baru
-                    </Link>
+                  <Button onClick={handleWriteStory} variant="outline" size="sm">
+                    <BookOpen size={16} className="mr-2" />
+                    Tulis Cerita Baru
                   </Button>
                 </div>
                 
@@ -255,7 +270,7 @@ const Profile = () => {
                   <div className="flex justify-center items-center h-40">
                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
                   </div>
-                ) : userStories.length > 0 ? (
+                ) : userStories && userStories.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
                     {userStories.map(story => (
                       <Link to={`/story/${story.id}`} key={story.id} className="block">
@@ -280,11 +295,9 @@ const Profile = () => {
                     <p className="text-muted-foreground mb-4">
                       Anda belum membuat cerita apapun. Mulai menulis cerita pertama Anda sekarang!
                     </p>
-                    <Button asChild>
-                      <Link to="/publish">
-                        <Pencil size={16} className="mr-2" />
-                        Tulis Cerita Pertama
-                      </Link>
+                    <Button onClick={handleWriteStory}>
+                      <Pencil size={16} className="mr-2" />
+                      Tulis Cerita Pertama
                     </Button>
                   </div>
                 )}
