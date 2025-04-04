@@ -40,10 +40,11 @@ const PremiumContentLock = ({
       
       {isUserLoggedIn ? (
         <Button 
-          className="mt-4 bg-gradient-to-r from-amber-500 to-amber-600"
+          className="mt-4"
           onClick={onPurchase}
+          disabled={true}
         >
-          Buka Konten Ini
+          Fitur Premium Tidak Tersedia
         </Button>
       ) : (
         <Button 
