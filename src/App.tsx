@@ -9,7 +9,6 @@ import AuthWrapper from "@/components/auth/AuthWrapper";
 import Index from "./pages/Index";
 import Search from "./pages/Search";
 import Publish from "./pages/Publish";
-import Coins from "./pages/Coins";
 import NotFound from "./pages/NotFound";
 import StoryPage from "./pages/StoryPage";
 import Auth from "./pages/Auth";
@@ -41,14 +40,6 @@ const App = () => (
               element={
                 <AuthWrapper requireAuth>
                   <Publish />
-                </AuthWrapper>
-              } 
-            />
-            <Route 
-              path="/coins" 
-              element={
-                <AuthWrapper requireAuth>
-                  <Coins />
                 </AuthWrapper>
               } 
             />

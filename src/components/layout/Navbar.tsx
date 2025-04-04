@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { Search, Home, User, Coins, Menu, X, LogOut, BookOpen } from 'lucide-react';
+import { Search, Home, User, Menu, X, LogOut, BookOpen } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
@@ -95,11 +95,6 @@ const Navbar = () => {
       icon: <User size={20} />,
       label: 'Profil'
     });
-    navItems.push({
-      to: '/coins',
-      icon: <Coins size={20} />,
-      label: 'Koin'
-    });
   }
 
   return <header className={cn("sticky top-0 z-50 w-full transition-all duration-300 px-4 md:px-6", isScrolled ? "bg-black/70 backdrop-blur-lg border-b border-white/5" : "bg-transparent")}>
@@ -145,10 +140,6 @@ const Navbar = () => {
                   <DropdownMenuItem onClick={() => navigate('/profile')}>
                     <User className="mr-2 h-4 w-4" />
                     <span>Profil</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/coins')}>
-                    <Coins className="mr-2 h-4 w-4" />
-                    <span>Koin: {profile?.coins || 0}</span>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={signOut}>
