@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -46,18 +47,23 @@ const Profile = () => {
   
   useEffect(() => {
     if (user) {
+      console.log('User ID for fetching stories:', user.id);
       fetchUserStories();
     }
   }, [user]);
   
   useEffect(() => {
     if (profileTab === 'stories' && user) {
+      console.log('Tab changed to stories or component rerendered, fetching stories again');
       fetchUserStories();
     }
   }, [profileTab, user]);
   
   const fetchUserStories = async () => {
-    if (!user) return;
+    if (!user) {
+      console.log('No user found, skipping story fetch');
+      return;
+    }
     
     try {
       setIsLoadingStories(true);
@@ -81,7 +87,11 @@ const Profile = () => {
       
       console.log('Fetched user stories:', data);
       
-      setUserStories(data || []);
+      if (data) {
+        setUserStories(data);
+      } else {
+        setUserStories([]);
+      }
     } catch (error) {
       console.error('Error in fetchUserStories:', error);
       toast({
@@ -203,6 +213,10 @@ const Profile = () => {
     navigate('/publish');
   };
   
+  const handleRefreshStories = () => {
+    fetchUserStories();
+  };
+  
   return <MainLayout>
       <div className="py-8 md:py-12 max-w-7xl mx-auto px-4 md:px-6">
         <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-8">
@@ -265,10 +279,17 @@ const Profile = () => {
               <TabsContent value="stories" className="mt-0">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-bold">Cerita Saya</h2>
-                  <Button onClick={handleWriteStory} variant="outline" size="sm">
-                    <BookOpen size={16} className="mr-2" />
-                    Tulis Cerita Baru
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button onClick={handleRefreshStories} variant="outline" size="sm" 
+                            className="hidden md:flex">
+                      <Loader2 className={`h-4 w-4 mr-2 ${isLoadingStories ? 'animate-spin' : ''}`} />
+                      Refresh
+                    </Button>
+                    <Button onClick={handleWriteStory} variant="outline" size="sm">
+                      <BookOpen size={16} className="mr-2" />
+                      Tulis Cerita Baru
+                    </Button>
+                  </div>
                 </div>
                 
                 {isLoadingStories ? (
@@ -279,16 +300,17 @@ const Profile = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
                     {userStories.map(story => (
                       <Link to={`/story/${story.id}`} key={story.id} className="block">
-                        <div className="bg-secondary/40 backdrop-blur-sm rounded-lg p-4 relative overflow-hidden group">
+                        <div className="bg-secondary/40 backdrop-blur-sm rounded-lg p-4 relative overflow-hidden group hover:bg-secondary/60 transition-all">
                           <Badge className="absolute top-2 left-2 z-10">{story.genre || 'Cerita'}</Badge>
                           <div className="relative aspect-[3/4] rounded-md overflow-hidden mb-3">
                             <img 
-                              src={story.cover_url || 'https://images.unsplash.com/photo-1532012197267-da84d127e765?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=387&q=80'} 
+                              src={story.cover_url || 'https://images.unsplash.com/photo-1532012197267-da84d127e765'} 
                               alt={story.title} 
                               className="w-full h-full object-cover transition-transform group-hover:scale-105" 
                             />
                           </div>
                           <h3 className="font-medium text-lg mt-2">{story.title}</h3>
+                          <p className="text-sm text-muted-foreground line-clamp-2 mt-1">{story.synopsis}</p>
                         </div>
                       </Link>
                     ))}
