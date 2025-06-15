@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -34,11 +35,39 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/search" element={<Search />} />
-            <Route path="/publish" element={<Publish />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/profile-setup" element={<ProfileSetup />} />
+            <Route 
+              path="/publish" 
+              element={
+                <AuthWrapper requireAuth>
+                  <Publish />
+                </AuthWrapper>
+              } 
+            />
+            <Route 
+              path="/profile" 
+              element={
+                <AuthWrapper requireAuth>
+                  <Profile />
+                </AuthWrapper>
+              } 
+            />
+            <Route 
+              path="/profile-setup" 
+              element={
+                <AuthWrapper requireAuth>
+                  <ProfileSetup />
+                </AuthWrapper>
+              } 
+            />
             <Route path="/story/:id" element={<StoryPage />} />
-            <Route path="/auth" element={<Auth />} />
+            <Route 
+              path="/auth" 
+              element={
+                <AuthWrapper>
+                  <Auth />
+                </AuthWrapper>
+              } 
+            />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
