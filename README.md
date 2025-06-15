@@ -1,3 +1,4 @@
+
 # Welcome to your Lovable project
 
 ## Project info
@@ -59,6 +60,10 @@ This project is built with .
 - React
 - shadcn-ui
 - Tailwind CSS
+
+## Project name
+
+**Ngomik**
 
 ## How can I deploy this project?
 

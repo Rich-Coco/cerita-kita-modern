@@ -7,8 +7,8 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-4">
             <Link to="/" className="flex items-center gap-2">
-              <img alt="Hunt Logo" className="h-12 w-12 text-primary object-fill" src="/lovable-uploads/1c888893-37be-4f66-bddd-72e892c60445.png" />
-              <span className="font-bold text-xl tracking-tight">Hunt</span>
+              <img alt="Ngomik Logo" className="h-12 w-12 text-primary object-fill" src="/lovable-uploads/1c888893-37be-4f66-bddd-72e892c60445.png" />
+              <span className="font-bold text-xl tracking-tight">Ngomik</span>
             </Link>
             <p className="text-muted-foreground max-w-md">
               Platform modern untuk membaca dan menerbitkan cerita dalam Bahasa Indonesia.
@@ -47,7 +47,7 @@ const Footer = () => {
         
         <div className="mt-8 pt-6 border-t border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-sm text-muted-foreground">
-            &copy; {new Date().getFullYear()} Hunt. Hak Cipta Dilindungi.
+            &copy; {new Date().getFullYear()} Ngomik. Hak Cipta Dilindungi.
           </p>
           <p className="text-sm text-muted-foreground flex items-center gap-1">
             Dibuat dengan <Heart size={14} className="text-red-500" /> di Indonesia

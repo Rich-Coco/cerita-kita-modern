@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -53,8 +52,8 @@ const Auth = () => {
   return <MainLayout>
       <div className="container max-w-md mx-auto py-10 px-4">
         <div className="flex flex-col items-center justify-center mb-8">
-          <img src="/lovable-uploads/6dad1c2d-8896-4f44-a42b-bb2bc2a43a99.png" alt="Hunt Logo" className="h-12 w-12 text-primary mb-2" />
-          <h1 className="text-2xl font-bold tracking-tight">Hunt</h1>
+          <img src="/lovable-uploads/6dad1c2d-8896-4f44-a42b-bb2bc2a43a99.png" alt="Ngomik Logo" className="h-12 w-12 text-primary mb-2" />
+          <h1 className="text-2xl font-bold tracking-tight">Ngomik</h1>
           <p className="text-muted-foreground text-center mt-2">
             Gabung dengan komunitas penulis dan pembaca cerita Indonesia
           </p>

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -101,8 +100,8 @@ const Navbar = () => {
       <div className="flex items-center justify-between h-16 max-w-7xl mx-auto">
         <div className="flex items-center gap-6">
           <Link to="/" className="flex items-center gap-2">
-            <img alt="Hunt Logo" className="h-12 w-12 text-primary object-cover" src="/lovable-uploads/5147552b-e69e-4cc2-ba04-add5d231fe04.png" />
-            <span className="font-bold tracking-tight text-2xl text-left mx-[5px]">Hunt</span>
+            <img alt="Ngomik Logo" className="h-12 w-12 text-primary object-cover" src="/lovable-uploads/5147552b-e69e-4cc2-ba04-add5d231fe04.png" />
+            <span className="font-bold tracking-tight text-2xl text-left mx-[5px]">Ngomik</span>
           </Link>
           
           <nav className="hidden md:flex items-center gap-1">
