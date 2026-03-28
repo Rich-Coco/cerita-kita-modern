@@ -326,6 +326,33 @@ const Publish = () => {
           </div>
         </Tabs>
       </div>
+
+      <Dialog open={showPublishDialog} onOpenChange={setShowPublishDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-amber-500" />
+              Peringatan
+            </DialogTitle>
+            <DialogDescription className="text-left space-y-3 pt-2">
+              <p>
+                Cerita yang Anda terbitkan akan <strong>hilang jika halaman di-refresh</strong>, karena data disimpan sementara di memori browser.
+              </p>
+              <p>
+                Untuk menikmati fitur penuh (penyimpanan permanen, manajemen cerita, dan lainnya), hubungi <strong>YongTech</strong>.
+              </p>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex flex-col sm:flex-row gap-2">
+            <Button variant="outline" onClick={() => setShowPublishDialog(false)}>
+              Batal
+            </Button>
+            <Button onClick={confirmPublish}>
+              Terbitkan Cerita
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </MainLayout>
   );
 };
