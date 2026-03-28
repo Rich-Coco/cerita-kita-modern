@@ -8,10 +8,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { toast } from '@/components/ui/use-toast';
-import { Plus, X, Upload, Check, FileText, ChevronRight } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Plus, X, Upload, Check, FileText, ChevronRight, AlertTriangle } from 'lucide-react';
 import { StoryFormData } from '@/types/story';
 import MainLayout from '@/components/layout/MainLayout';
+import { useUserStories } from '@/stores/useUserStories';
 
 const genres = [
   'Fiksi Fantasi', 'Romance', 'Techno Thriller', 'Misteri',
@@ -30,12 +32,14 @@ const initialFormData: StoryFormData = {
 
 const Publish = () => {
   const navigate = useNavigate();
+  const addStory = useUserStories((s) => s.addStory);
   const [formData, setFormData] = useState<StoryFormData>(initialFormData);
   const [currentTab, setCurrentTab] = useState('info');
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const [tagInput, setTagInput] = useState('');
   const [chapterTitle, setChapterTitle] = useState('');
   const [chapterContent, setChapterContent] = useState('');
+  const [showPublishDialog, setShowPublishDialog] = useState(false);
   const [formErrors, setFormErrors] = useState({
     title: false, synopsis: false, genre: false, cover: false, tags: false,
     chapterTitle: false, chapterContent: false,
@@ -125,7 +129,21 @@ const Publish = () => {
       toast({ title: "Tidak Dapat Menerbitkan", description: "Cerita harus memiliki minimal satu chapter.", variant: "destructive" });
       return;
     }
-    toast({ title: "Fitur Belum Tersedia", description: "Hubungkan database untuk menerbitkan cerita.", variant: "destructive" });
+    setShowPublishDialog(true);
+  };
+
+  const confirmPublish = () => {
+    addStory({
+      title: formData.title,
+      synopsis: formData.synopsis,
+      genre: formData.genre,
+      tags: formData.tags,
+      coverUrl: coverPreview,
+      chapters: formData.chapters.map((ch) => ({ title: ch.title, content: ch.content })),
+    });
+    setShowPublishDialog(false);
+    toast({ title: "Cerita Berhasil Diterbitkan!", description: "Cerita anda telah berhasil diterbitkan." });
+    setTimeout(() => navigate('/profile'), 1000);
   };
 
   return (
@@ -308,6 +326,33 @@ const Publish = () => {
           </div>
         </Tabs>
       </div>
+
+      <Dialog open={showPublishDialog} onOpenChange={setShowPublishDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-amber-500" />
+              Peringatan
+            </DialogTitle>
+            <DialogDescription className="text-left space-y-3 pt-2">
+              <p>
+                Cerita yang Anda terbitkan akan <strong>hilang jika halaman di-refresh</strong>, karena data disimpan sementara di memori browser.
+              </p>
+              <p>
+                Untuk menikmati fitur penuh (penyimpanan permanen, manajemen cerita, dan lainnya), hubungi <strong>YongTech</strong>.
+              </p>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex flex-col sm:flex-row gap-2">
+            <Button variant="outline" onClick={() => setShowPublishDialog(false)}>
+              Batal
+            </Button>
+            <Button onClick={confirmPublish}>
+              Terbitkan Cerita
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </MainLayout>
   );
 };
